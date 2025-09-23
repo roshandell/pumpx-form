@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PumpX | قدرتی که آینده رو می‌سازه</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazir&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Vazir', sans-serif;
+      background-color: #0f172a;
+      color: #ffffff;
+      direction: rtl;
+    }
+    header {
+      padding: 20px;
+      text-align: center;
+      background-color: #1e293b;
+    }
+    header h1 {
+      font-size: 2.5em;
+      margin: 0;
+    }
+    .hero {
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .hero p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+    }
+    .btn {
+      background-color: #3b82f6;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 40px 20px;
+    }
+    .feature {
+      background-color: #1e293b;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #1e293b;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>PumpX</h1>
+  <p>قدرتی که آینده رو می‌سازه</p>
+</header>
+
+<section class="hero">
+  <p>PumpX یک پلتفرم هوشمند برای ساخت توکن‌های سولانا، مدیریت داده‌ها، و رشد برند با قدرت هوش مصنوعی است.</p>
+  <button class="btn">شروع کن</button>
+</section>
+
+<section class="features">
+  <div class="feature">✅ ساخت توکن سولانا با یک کلیک</div>
+  <div class="feature">📊 داشبورد تحلیل هوشمند</div>
+  <div class="feature">🤖 چت‌بات پشتیبانی ۲۴/۷</div>
+  <div class="feature">📩 ایمیل‌های رسمی مثل admin@pumpx.info</div>
+  <div class="feature">🚀 آماده وایرال شدن در Product Hunt و Reddit</div>
+</section>
+
+<footer>
+  © 2025 PumpX. ساخته شده با عشق و هوش مصنوعی.
+</footer>
+
+</body>
+</html>
