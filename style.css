@@ -1,22 +1,24 @@
-body {
-  font-family: sans-serif;
-  direction: rtl;
-  padding: 20px;
-  background: #f9f9f9;
+:root{
+  --bg:#0b0f1a; --card:#0f1524; --muted:#9aa3b2; --line:#23304c;
 }
-
-h1 {
-  color: #333;
+*{box-sizing:border-box} body{
+  margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans Arabic", sans-serif;
+  background:var(--bg); color:#fff; display:grid; place-items:center; min-height:100vh; padding:24px;
 }
-
-form {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.card{background:var(--card); border:1px solid #ffffff14; border-radius:18px; padding:24px; max-width:880px; width:100%; box-shadow:0 6px 30px #0008}
+h1{margin:0; font-weight:800; letter-spacing:.5px}
+.row{display:flex; align-items:center}
+.gap{gap:12px}
+.grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:16px 0}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+label{display:flex; flex-direction:column; gap:6px; font-size:14px; color:#cfd6e4}
+input,select,button{
+  background:#121a2c; color:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:14px;
 }
-
-input, textarea, button {
-  padding: 10px;
-  font-size: 16px;
-}
+button{background:linear-gradient(90deg,#12f0ff22,#ff3ef622); cursor:pointer}
+button:hover{background:linear-gradient(90deg,#12f0ff33,#ff3ef633)}
+button:disabled{opacity:.5; cursor:not-allowed}
+.result{margin-top:16px; padding:12px; border:1px dashed var(--line); border-radius:12px; background:#0005; word-break:break-all}
+.hidden{display:none}
+.tip{opacity:.7; font-size:12px; margin-top:16px}
+a{color:#7adcff}
