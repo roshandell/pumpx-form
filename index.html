@@ -1,23 +1,36 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PumpX | ساخت توکن</title>
-  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-  <h1>ساخت توکن جدید</h1>
+<body class="bg-gray-100 text-gray-800 font-sans p-6">
 
-  <button onclick="connectWallet()">اتصال به کیف پول</button>
+  <div class="max-w-xl mx-auto bg-white shadow-lg rounded-lg p-6">
+    <h1 class="text-2xl font-bold mb-4 text-center">ساخت توکن جدید</h1>
 
-  <form id="tokenForm">
-    <input type="text" placeholder="نام توکن" id="name" required>
-    <input type="text" placeholder="نماد توکن" id="symbol" required>
-    <input type="number" placeholder="عرضه کل" id="supply" required>
-    <textarea placeholder="توضیحات" id="description"></textarea>
-    <input type="text" placeholder="نام فایل لوگو (اختیاری)" id="logo">
-    <button type="submit">ساخت توکن</button>
-  </form>
+    <button onclick="connectWallet()" class="bg-indigo-600 text-white px-4 py-2 rounded mb-4 w-full">
+      اتصال به کیف پول
+    </button>
+    <p id="walletAddress" class="text-sm text-gray-600 mb-4 text-center"></p>
+
+    <form id="tokenForm" class="space-y-4">
+      <input type="text" id="name" placeholder="نام توکن" required class="w-full border p-2 rounded" />
+      <input type="text" id="symbol" placeholder="نماد توکن" required class="w-full border p-2 rounded" />
+      <input type="number" id="supply" placeholder="عرضه کل" required class="w-full border p-2 rounded" />
+      <textarea id="description" placeholder="توضیحات" class="w-full border p-2 rounded"></textarea>
+
+      <label class="block text-sm font-medium text-gray-700">بارگذاری لوگو</label>
+      <input type="file" id="logo" accept="image/*" class="w-full border p-2 rounded" />
+      <img id="logoPreview" class="mt-2 w-24 h-24 object-cover rounded hidden" />
+
+      <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded w-full">
+        ساخت توکن
+      </button>
+    </form>
+  </div>
 
   <script src="script.js"></script>
 </body>
