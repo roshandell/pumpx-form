@@ -1,174 +1,166 @@
-<!doctype html>
-<html lang="fa" dir="rtl">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>PumpX • ساخت توکن سولانا</title>
-  <meta name="description" content="PumpX — ساخت و لانچ توکن روی Solana با اتصال Phantom"/>
-  <link rel="preconnect" href="https://esm.sh"/>
-  <style>
-    :root{
-      --bg:#0b0f1a;--card:#0f1524;--line:#23304c;--muted:#9aa3b2;
-      --g1:linear-gradient(90deg,#12f0ff55,#7a5cff44,#ff3ef644);
-    }
-    *{box-sizing:border-box}html,body{margin:0;height:100%}
-    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans Arabic",sans-serif;
-      background:radial-gradient(1200px 600px at 10% -10%,#7a5cff22,transparent),
-                 radial-gradient(800px 500px at 110% 20%,#ff3ef622,transparent),
-                 var(--bg);color:#fff}
-    .wrap{max-width:1100px;margin:auto;padding:24px}
-    .nav{position:sticky;top:0;z-index:40;backdrop-filter:blur(8px);
-      background:#0b0f1acc;border-bottom:1px solid #ffffff18}
-    .navin{display:flex;align-items:center;justify-content:space-between;height:64px}
-    .logo{display:flex;align-items:center;gap:10px;cursor:default}
-    .mark{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;
-      border:1px solid #ffffff22;background:var(--g1);font-weight:900}
-    .btn{background:var(--g1);border:1px solid #ffffff22;color:#fff;cursor:pointer;
-      padding:10px 14px;border-radius:12px}
-    .btn:hover{filter:brightness(1.1)}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
-    .hero{display:grid;gap:18px;margin:28px 0 18px}
-    .title{font-weight:900;font-size:clamp(32px,4vw,54px);line-height:1.15}
-    .subtitle{color:#cfe1ff;opacity:.85;max-width:720px}
-    .card{background:#0f1524cc;border:1px solid #ffffff22;border-radius:20px;padding:18px;box-shadow:0 10px 40px #0006}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    @media(max-width:700px){.grid{grid-template-columns:1fr}}
-    label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:#cfd6e4}
-    input,select{background:#121a2c;color:#fff;border:1px solid var(--line);
-      border-radius:12px;padding:10px 12px;font-size:14px}
-    .status{font-size:13px;opacity:.8}
-    .result{margin-top:14px;padding:12px;border-radius:14px;border:1px dashed #ffffff22;background:#0005;word-break:break-all}
-    .footer{opacity:.75;font-size:12px;margin-top:10px}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid #ffffff22;background:#ffffff10;font-size:12px}
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  </style>
-</head>
-<body>
-  <!-- NAV -->
-  <div class="nav">
-    <div class="wrap navin">
-      <div class="logo">
-        <div class="mark">P</div>
-        <div style="font-weight:900;letter-spacing:.12em">PumpX</div>
-      </div>
-      <div class="row">
-        <select id="network">
-          <option value="devnet" selected>Devnet</option>
-          <option value="mainnet-beta">Mainnet</option>
-        </select>
-        <button id="connect" class="btn">اتصال به Phantom</button>
-      </div>
+<!doctype html><html lang="fa" dir="rtl"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PumpX • Token Creator Pro</title>
+<link rel="preconnect" href="https://esm.sh"/>
+<style>
+  :root{--bg:#0b0f1a;--card:#0f1524;--line:#23304c}
+  *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,"Noto Sans Arabic",sans-serif;background:var(--bg);color:#fff}
+  .wrap{max-width:1100px;margin:auto;padding:22px}
+  .nav{position:sticky;top:0;z-index:40;background:#0b0f1acc;border-bottom:1px solid #ffffff18;backdrop-filter:blur(10px)}
+  .navin{display:flex;justify-content:space-between;align-items:center;height:64px}
+  .btn{background:linear-gradient(90deg,#12f0ff44,#7a5cff33,#ff3ef633);border:1px solid #ffffff22;padding:10px 14px;border-radius:12px;color:#fff;cursor:pointer}
+  .btn:disabled{opacity:.5;cursor:not-allowed}.select,.input{background:#121a2c;border:1px solid var(--line);color:#fff;border-radius:12px;padding:10px 12px}
+  .card{background:#0f1524cc;border:1px solid #ffffff22;border-radius:18px;padding:16px;box-shadow:0 10px 40px #0006;margin-top:16px}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}@media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.muted{opacity:.8;font-size:13px}.result{word-break:break-all}
+</style>
+</head><body>
+<div class="nav"><div class="wrap navin">
+  <div style="font-weight:900;letter-spacing:.12em">PumpX • Token Creator Pro</div>
+  <div class="row">
+    <select id="network" class="select"><option value="devnet" selected>Devnet</option><option value="mainnet-beta">Mainnet</option></select>
+    <button id="connect" class="btn">اتصال Phantom</button>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <section class="card">
+    <h2 style="margin:0 0 10px">ویزارد ساخت توکن</h2>
+    <div class="grid">
+      <label>نام (روی‌چین) <input id="name" class="input" value="PumpX Token Pro"></label>
+      <label>نماد <input id="symbol" class="input" value="PXP"></label>
+      <label>Decimals <input id="decimals" class="input" type="number" min="0" max="9" value="9"></label>
+      <label>عرضه اولیه (به واحد انسانی) <input id="supply" class="input" type="number" value="1000000"></label>
+      <label>آیکون (PNG/SVG) <input id="icon" class="input" type="file" accept=".png,.svg,.jpg,.jpeg" /></label>
+      <label class="muted">داستان برند (اختیاری) <input id="story" class="input" placeholder="یک جمله جذاب"></label>
     </div>
-  </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="create" disabled>ساخت + ثبت متادیتا</button>
+      <button class="btn" id="lock" disabled>قفل کردن Mint Authority</button>
+      <span id="status" class="muted"></span>
+    </div>
+    <div id="out" class="card result" style="display:none;margin-top:12px"></div>
+    <div class="muted" style="margin-top:8px">تصویر و JSON روی IPFS پین می‌شود؛ سپس
+      <b>Token Metadata (createV1)</b> با <b>URI</b> ساخته می‌شود.</div>
+  </section>
+</div>
 
-  <div class="wrap">
-    <!-- HERO -->
-    <section class="hero">
-      <div class="title">ساخت و لانچ توکن روی Solana — سریع، زیبا، حرفه‌ای</div>
-      <div class="subtitle">این نسخهٔ بدون بیلد برای GitHub Pages طراحی شده: اتصال Phantom، ساخت
-        SPL Token روی Devnet و نمایش لینک اکسپلورر. نسخهٔ کامل (Metadata/IPFS/Presale) در گام بعد.</div>
-      <div class="row">
-        <div class="pill">UI شیشه‌ای/نئونی</div>
-        <div class="pill">Phantom Ready</div>
-        <div class="pill">Devnet First</div>
-      </div>
-    </section>
+<script type="module">
+  // ---- Config ----
+  const IPFS_ENDPOINT = "https://YOUR-WORKER-URL"; // ← Worker مرحله 1
 
-    <!-- CREATE TOKEN -->
-    <section class="card">
-      <h2 style="margin:0 0 10px;font-size:18px">فرم ساخت توکن</h2>
-      <div class="grid">
-        <label>نام (UI)
-          <input id="name" value="PumpX Token"/>
-        </label>
-        <label>نماد (Symbol)
-          <input id="symbol" value="PXP"/>
-        </label>
-        <label>Decimals
-          <input id="decimals" type="number" min="0" max="9" value="9"/>
-        </label>
-        <label>عرضه اولیه (به واحد انسانی)
-          <input id="supply" type="number" value="1000000"/>
-        </label>
-      </div>
+  // ---- Imports (ESM) ----
+  import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
+  import { createMint, getOrCreateAssociatedTokenAccount, mintTo, setAuthority, AuthorityType, TOKEN_PROGRAM_ID }
+    from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
 
-      <div class="row" style="margin-top:12px">
-        <button id="create" class="btn" disabled>ساخت توکن</button>
-        <span id="status" class="status"></span>
-      </div>
+  // UMI + Token Metadata (Metaplex)
+  import { createUmi } from "https://esm.sh/@metaplex-foundation/umi-bundle-defaults@0.8.10";
+  import { publicKey as umiPk, signerIdentity } from "https://esm.sh/@metaplex-foundation/umi@0.8.10";
+  import { createV1 } from "https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.1.2";
 
-      <div id="result" class="result" style="display:none"></div>
-      <div class="footer">نکته: این نسخهٔ MVP متادیتای روی‌چین را ثبت نمی‌کند. نسخهٔ بعدی با
-        <b>Token Metadata Program</b> (نام/نماد/آیکون روی IPFS/Arweave) عرضه می‌شود.</div>
-    </section>
-  </div>
+  // ---- DOM ----
+  const $ = id => document.getElementById(id);
+  const networkSel = $("network"), connectBtn = $("connect"), createBtn = $("create"), lockBtn = $("lock");
+  const statusEl = $("status"), out = $("out");
 
-  <!-- APP (No build. ESM imports) -->
-  <script type="module">
-    import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
-    import { createMint, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID }
-      from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
+  let wallet = null, network = "devnet", connection = new Connection(clusterApiUrl(network), "confirmed");
+  let lastMintPk = null;
 
-    const $ = id => document.getElementById(id);
-    const statusEl = $("status"), resultEl = $("result"), connectBtn = $("connect");
-    const networkSel = $("network"), createBtn = $("create");
-    let wallet = null, network = "devnet", connection = new Connection(clusterApiUrl(network), "confirmed");
+  networkSel.onchange = (e)=>{ network = e.target.value; connection = new Connection(clusterApiUrl(network), "confirmed"); };
 
-    // network switch
-    networkSel.addEventListener("change", e=>{
-      network = e.target.value; connection = new Connection(clusterApiUrl(network), "confirmed");
-    });
+  connectBtn.onclick = async () => {
+    if (!window.solana || !window.solana.isPhantom){ alert("Phantom نصب نیست"); return; }
+    const r = await window.solana.connect();
+    wallet = new PublicKey(r.publicKey.toString());
+    connectBtn.textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
+    createBtn.disabled = false;
+  };
 
-    // connect phantom
-    connectBtn.addEventListener("click", async ()=>{
-      try{
-        if(!window.solana || !window.solana.isPhantom){ alert("Phantom نصب نیست"); return; }
-        const resp = await window.solana.connect();
-        wallet = new PublicKey(resp.publicKey.toString());
-        connectBtn.textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
-        createBtn.disabled = false;
-      }catch(e){ console.error(e); alert("اتصال ناموفق بود"); }
-    });
-
-    // create token
-    createBtn.addEventListener("click", async ()=>{
+  createBtn.onclick = async () => {
+    try{
       if(!wallet) return alert("ابتدا به Phantom وصل شوید.");
-      const name = $("name").value.trim();
-      const symbol = $("symbol").value.trim();
+      const name = $("name").value.trim(), symbol = $("symbol").value.trim();
       const decimals = Math.max(0, Math.min(9, parseInt($("decimals").value||"9",10)));
-      const supplyHuman = Number($("supply").value||"0"); if(!(supplyHuman>0)) return alert("عرضه اولیه معتبر نیست.");
-      try{
-        setStatus("ایجاد Mint…");
-        const provider = window.solana;
-        const signer = {
-          publicKey: wallet,
-          signTransaction: tx => provider.signTransaction(tx),
-          signAllTransactions: txs => provider.signAllTransactions(txs)
-        };
-        const mintPk = await createMint(connection, signer, wallet, wallet, decimals, undefined, undefined, TOKEN_PROGRAM_ID);
+      const supplyHuman = Number($("supply").value||"0"); if(!(supplyHuman>0)) return alert("عرضه اولیه نامعتبر");
+      const story = $("story").value.trim();
+      const iconFile = $("icon").files[0];
 
-        setStatus("ساخت حساب توکن (ATA)...");
-        const ata = await getOrCreateAssociatedTokenAccount(connection, signer, mintPk, wallet);
-
-        setStatus("مینت عرضه اولیه…");
-        const amount = Math.round(supplyHuman * 10**decimals);
-        const sig = await mintTo(connection, signer, mintPk, ata.address, wallet, amount);
-
-        setStatus("انجام شد ✅");
-        const txUrl = `https://explorer.solana.com/tx/${sig}?cluster=${network==="devnet"?"devnet":""}`;
-        const addrUrl = `https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}`;
-        resultEl.style.display = "block";
-        resultEl.innerHTML = `
-          <div>نام/نماد (UI): <b>${name}</b> (${symbol})</div>
-          <div>آدرس مینت: <code>${mintPk.toBase58()}</code></div>
-          <div><a target="_blank" href="${addrUrl}">مشاهده Mint در Explorer</a> •
-              <a target="_blank" href="${txUrl}">تراکنش</a></div>`;
-      }catch(e){
-        console.error(e); setStatus("خطا"); alert(e?.message||e);
+      setStatus("آپلود آیکون به IPFS…");
+      let imageUri = "";
+      if(iconFile){
+        const fd = new FormData(); fd.append("file", iconFile);
+        const up = await fetch(IPFS_ENDPOINT+"/upload-image", { method:"POST", body:fd });
+        const j = await up.json(); imageUri = j.uri; // ipfs://CID
       }
-    });
 
-    function setStatus(t){ statusEl.textContent = t; }
-  </script>
-</body>
-</html>
+      setStatus("ساخت متادیتای JSON و آپلود…");
+      const metadata = {
+        name, symbol,
+        description: story || `Token ${name} created via PumpX`,
+        image: imageUri, // ipfs://...
+        extensions: { website: "https://pumpx.info" }
+      };
+      const upJ = await fetch(IPFS_ENDPOINT+"/upload-json", { method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(metadata) });
+      const jj = await upJ.json(); const metaUri = jj.uri;
+
+      // ساخت Mint + مینت عرضه
+      setStatus("ایجاد Mint و مینت عرضه…");
+      const provider = window.solana;
+      const signer = {
+        publicKey: wallet,
+        signTransaction: (tx)=>provider.signTransaction(tx),
+        signAllTransactions: (txs)=>provider.signAllTransactions(txs)
+      };
+      const mintPk = await createMint(connection, signer, wallet, wallet, decimals, undefined, undefined, TOKEN_PROGRAM_ID);
+      const ata = await getOrCreateAssociatedTokenAccount(connection, signer, mintPk, wallet);
+      const amount = Math.round(supplyHuman * 10**decimals);
+      await mintTo(connection, signer, mintPk, ata.address, wallet, amount);
+
+      // ثبت Token Metadata روی‌چین
+      setStatus("ثبت Token Metadata روی‌چین…");
+      const umi = createUmi(clusterApiUrl(network));
+      umi.use(signerIdentity({
+        publicKey: umiPk(wallet.toBase58()),
+        signTransaction: async (tx) => provider.signTransaction(tx),
+        signAllTransactions: async (txs) => provider.signAllTransactions(txs)
+      }));
+
+      const tx = await createV1(umi, {
+        mint: umiPk(mintPk.toBase58()),
+        authority: umiPk(wallet.toBase58()),
+        payer: umiPk(wallet.toBase58()),
+        updateAuthority: umiPk(wallet.toBase58()),
+        name, symbol, uri: metaUri,
+        sellerFeeBasisPoints: 0
+      }).sendAndConfirm(umi);
+
+      lastMintPk = mintPk;
+
+      setStatus("تمام ✅");
+      out.style.display="block";
+      out.innerHTML = `
+        <div>Mint: <code>${mintPk.toBase58()}</code></div>
+        <div>Metadata URI: <code>${metaUri}</code></div>
+        <div>
+          <a target="_blank" href="https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}">مشاهده Mint</a> •
+          <a target="_blank" href="https://explorer.solana.com/tx/${tx}?cluster=${network==="devnet"?"devnet":""}">تراکنش Metadata</a>
+        </div>`;
+      lockBtn.disabled = false;
+    }catch(e){ console.error(e); setStatus("خطا"); alert(e?.message||e); }
+  };
+
+  lockBtn.onclick = async () => {
+    try{
+      if(!lastMintPk) return;
+      setStatus("قفل‌کردن mint authority…");
+      const provider = window.solana;
+      const signer = { publicKey: wallet, signTransaction: (tx)=>provider.signTransaction(tx), signAllTransactions: (txs)=>provider.signAllTransactions(txs) };
+      await setAuthority(connection, signer, lastMintPk, wallet, AuthorityType.MintTokens, null); // authority = null
+      setStatus("Mint قفل شد 🔒");
+    }catch(e){ console.error(e); setStatus("خطا در قفل"); alert(e?.message||e); }
+  };
+
+  function setStatus(t){ statusEl.textContent = t; }
+</script>
+</body></html>
