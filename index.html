@@ -1,7 +1,109 @@
-<script type="module">
-// ... بالای فایل همان است ...
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Solana Wallet Test • Debug Safe</title>
+<link rel="preconnect" href="https://esm.sh" crossorigin>
+<style>
+  :root{--bg:#0b0f1a;--card:#0f1524;--line:#334466}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:#fff;font-family:Inter,system-ui,"Noto Sans Arabic",sans-serif}
+  .wrap{max-width:780px;margin:auto;padding:20px}
+  .card{background:#0f1524;border:1px solid #ffffff22;border-radius:16px;padding:16px;margin:12px 0}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .btn{background:#1b2744;border:1px solid var(--line);color:#fff;border-radius:10px;padding:10px 12px;cursor:pointer}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  select{background:#121a2c;border:1px solid var(--line);color:#fff;border-radius:10px;padding:8px 10px}
+  .code{background:#0b0f1a;border:1px solid var(--line);border-radius:10px;padding:8px 10px;word-break:break-all}
+  .muted{opacity:.8;font-size:13px}
+  /* Error overlay */
+  #err{position:fixed;inset:0;display:none;background:#000c;color:#fff;z-index:9999}
+  #err .box{max-width:900px;margin:40px auto;background:#1a0f13;border:1px solid #ff4978;padding:16px;border-radius:12px}
+  #err pre{white-space:pre-wrap;direction:ltr}
+</style>
+</head>
+<body>
+<div id="err"><div class="box">
+  <div style="font-weight:800;color:#ff7aa6">JavaScript Error</div>
+  <pre id="errmsg">...</pre>
+  <button class="btn" onclick="location.reload()">Reload</button>
+</div></div>
 
-// 1) لیست RPCهای جایگزین برای هر شبکه
+<div class="wrap">
+  <h1 style="margin:10px 0">تست کیف پول سولانا — Phantom / Solflare (Debug)</h1>
+
+  <div class="card">
+    <div class="row">
+      <label>شبکه:
+        <select id="network">
+          <option value="devnet" selected>Devnet</option>
+          <option value="mainnet-beta">Mainnet</option>
+        </select>
+      </label>
+      <span id="https" class="muted">HTTPS: —</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>اتصال</h3>
+    <div class="row">
+      <button id="connect-phantom" class="btn">اتصال Phantom</button>
+      <button id="connect-solflare" class="btn">اتصال Solflare</button>
+      <button id="disconnect" class="btn" disabled>قطع اتصال</button>
+      <span id="status" class="muted"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>وضعیت</h3>
+    <div class="row"><span class="muted">Provider:</span> <span id="prov" class="code">—</span></div>
+    <div class="row"><span class="muted">آدرس:</span> <span id="addr" class="code">—</span></div>
+    <div class="row"><span class="muted">موجودی SOL:</span> <span id="bal" class="code">—</span></div>
+  </div>
+
+  <div class="card">
+    <h3>راهنما</h3>
+    <ul class="muted">
+      <li>حتماً با <b>HTTPS</b> باز کن (GitHub Pages → Enforce HTTPS).</li>
+      <li>دسکتاپ: افزونه‌های Phantom/Solflare نصب و Unlock.</li>
+      <li>Devnet: از فاست SOL بگیر. اگر موجودی «خطا» شد، شبکه کیف را با انتخاب بالا یکی کن.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  // Error overlay
+  (function(){
+    const show = (msg)=>{
+      document.getElementById('errmsg').textContent = msg;
+      document.getElementById('err').style.display='block';
+      console.error(msg);
+    };
+    window.addEventListener('error', e=> show('Error: '+(e.message||e.error||'unknown')), true);
+    window.addEventListener('unhandledrejection', e=> show('Promise rejection: '+(e.reason?.message||e.reason||'unknown')), true);
+  })();
+</script>
+
+<script type="module">
+import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
+
+const $ = id => document.getElementById(id);
+const netSel = $("network");
+const btnPhantom = $("connect-phantom");
+const btnSolflare = $("connect-solflare");
+const btnDisconnect = $("disconnect");
+const statusEl = $("status");
+const provEl = $("prov");
+const addrEl = $("addr");
+const balEl = $("bal");
+$("https").textContent = location.protocol.startsWith("https") ? "HTTPS: بله ✅" : "HTTPS: خیر ❌";
+
+let provider = null;
+let walletPubkey = null;
+let network = "devnet";
+
+// چند RPC برای پایداری
 const RPCS = {
   "devnet": [
     clusterApiUrl("devnet"),
@@ -11,53 +113,97 @@ const RPCS = {
   "mainnet-beta": [
     clusterApiUrl("mainnet-beta"),
     "https://api.mainnet-beta.solana.com",
-    "https://rpc.ankr.com/solana" // عمومی و پایدار
+    "https://rpc.ankr.com/solana"
   ]
 };
+let connection = new Connection(RPCS[network][0], "confirmed");
 
-// 2) تابع امنِ دریافت موجودی با چند RPC
+function setStatus(t){ statusEl.textContent = t || ""; }
+function short(pk){ return pk ? pk.slice(0,4)+"…"+pk.slice(-4) : "—"; }
+
+function getPhantomProvider(){
+  const w = window;
+  if (w?.phantom?.solana?.isPhantom) return w.phantom.solana;
+  if (w?.solana?.isPhantom) return w.solana;
+  return null;
+}
+function getSolflareProvider(){
+  const w = window;
+  if (w?.solflare) return w.solflare;
+  if (w?.solana?.isSolflare) return w.solana;
+  return null;
+}
+function showProviderName(p){
+  if(!p){ provEl.textContent = "پیدا نشد ❌"; return; }
+  if (p === getPhantomProvider()) provEl.textContent = "Phantom ✅";
+  else if (p === getSolflareProvider()) provEl.textContent = "Solflare ✅";
+  else provEl.textContent = "نامشخص/سازگار ✅";
+}
+
 async function safeGetBalance(pubkeyBase58, net){
   const pks = new PublicKey(pubkeyBase58);
-  let lastErr = null;
-  for (const url of RPCS[net] || []) {
-    try {
-      const conn = new Connection(url, "confirmed");
+  let lastErr=null;
+  for(const url of (RPCS[net]||[])){
+    try{
+      const conn = new Connection(url,"confirmed");
       const lamports = await conn.getBalance(pks);
-      return lamports; // موفق
-    } catch (e) {
-      lastErr = e;
-      // ادامه بده و بعدی را امتحان کن
-    }
+      return lamports;
+    }catch(e){ lastErr=e; }
   }
-  throw lastErr || new Error("RPCs unavailable");
+  throw lastErr||new Error("RPCs unavailable");
 }
-
-// 3) جایگزینِ تابع refreshBalance قبلی
 async function refreshBalance(){
-  if (!walletPubkey) { balEl.textContent = "—"; return; }
-  balEl.textContent = "در حال خواندن…";
-  try {
+  if(!walletPubkey){ balEl.textContent="—"; return; }
+  balEl.textContent="…";
+  try{
     const lamports = await safeGetBalance(walletPubkey, network);
-    balEl.textContent = (lamports / 1e9).toFixed(6);
-  } catch (e) {
+    balEl.textContent = (lamports/1e9).toFixed(6);
+  }catch(e){
     balEl.textContent = "خطا";
-    console.error("Balance error:", e);
-    // پیام دوستانه برای دو خطای رایج:
-    if (String(e).includes("rate") || String(e).includes("429")) {
-      setStatus("RPC شلوغ است؛ دوباره امتحان کن یا شبکه را جابه‌جا کن.");
-    } else {
-      setStatus("شبکهٔ کیف را با انتخاب صفحه یکی کن (Devnet/Mainnet).");
-    }
+    setStatus( String(e).includes("429") ? "RPC شلوغ است؛ دوباره تلاش کن." : "شبکه کیف و انتخاب بالا یکی باشد." );
+    console.error(e);
   }
 }
 
-// 4) وقتی شبکه عوض شد، connection و موجودی را رفرش کن
 netSel.addEventListener("change", async e=>{
   network = e.target.value;
-  connection = new Connection(RPCS[network][0], "confirmed"); // اولین RPC لیست
+  connection = new Connection(RPCS[network][0], "confirmed");
   await refreshBalance();
 });
 
-// 5) بعد از اتصال کیف، refreshBalance صدا زده شود (در کد اتصال شما همین را اضافه کنید)
-// await refreshBalance();
+async function connectWith(p){
+  if(!p){ setStatus("Provider یافت نشد."); showProviderName(null); return; }
+  provider = p; showProviderName(provider);
+  try{
+    const resp = await (provider.connect ? provider.connect() : provider.request({method:"connect"}));
+    const pk = resp?.publicKey?.toString?.() || provider.publicKey?.toString?.();
+    if(!pk) throw new Error("PublicKey برنگشت.");
+    walletPubkey = pk;
+    addrEl.textContent = pk;
+    setStatus("متصل شد: "+short(pk));
+    btnDisconnect.disabled = false;
+    await refreshBalance();
+  }catch(e){
+    setStatus("خطا/لغو اتصال: "+(e?.message||e));
+    console.error(e);
+  }
+}
+async function disconnect(){
+  try{ await provider?.disconnect?.(); }catch{}
+  walletPubkey=null; addrEl.textContent="—"; balEl.textContent="—";
+  btnDisconnect.disabled=true; setStatus("قطع شد");
+}
+
+btnPhantom.addEventListener("click", ()=>connectWith(getPhantomProvider()));
+btnSolflare.addEventListener("click", ()=>connectWith(getSolflareProvider()));
+btnDisconnect.addEventListener("click", disconnect);
+
+// اطلاعات اولیه
+window.addEventListener("load", ()=>{
+  const p1 = !!getPhantomProvider();
+  const p2 = !!getSolflareProvider();
+  provEl.textContent = (p1? "Phantom✅ " : "Phantom❌ ") + "| " + (p2? "Solflare✅" : "Solflare❌");
+});
 </script>
+</body>
+</html>
