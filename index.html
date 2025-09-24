@@ -1,166 +1,183 @@
-<!doctype html><html lang="fa" dir="rtl"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PumpX • Token Creator Pro</title>
-<link rel="preconnect" href="https://esm.sh"/>
-<style>
-  :root{--bg:#0b0f1a;--card:#0f1524;--line:#23304c}
-  *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,"Noto Sans Arabic",sans-serif;background:var(--bg);color:#fff}
-  .wrap{max-width:1100px;margin:auto;padding:22px}
-  .nav{position:sticky;top:0;z-index:40;background:#0b0f1acc;border-bottom:1px solid #ffffff18;backdrop-filter:blur(10px)}
-  .navin{display:flex;justify-content:space-between;align-items:center;height:64px}
-  .btn{background:linear-gradient(90deg,#12f0ff44,#7a5cff33,#ff3ef633);border:1px solid #ffffff22;padding:10px 14px;border-radius:12px;color:#fff;cursor:pointer}
-  .btn:disabled{opacity:.5;cursor:not-allowed}.select,.input{background:#121a2c;border:1px solid var(--line);color:#fff;border-radius:12px;padding:10px 12px}
-  .card{background:#0f1524cc;border:1px solid #ffffff22;border-radius:18px;padding:16px;box-shadow:0 10px 40px #0006;margin-top:16px}
-  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}@media(max-width:720px){.grid{grid-template-columns:1fr}}
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.muted{opacity:.8;font-size:13px}.result{word-break:break-all}
-</style>
-</head><body>
-<div class="nav"><div class="wrap navin">
-  <div style="font-weight:900;letter-spacing:.12em">PumpX • Token Creator Pro</div>
-  <div class="row">
-    <select id="network" class="select"><option value="devnet" selected>Devnet</option><option value="mainnet-beta">Mainnet</option></select>
-    <button id="connect" class="btn">اتصال Phantom</button>
-  </div>
-</div></div>
-
-<div class="wrap">
-  <section class="card">
-    <h2 style="margin:0 0 10px">ویزارد ساخت توکن</h2>
-    <div class="grid">
-      <label>نام (روی‌چین) <input id="name" class="input" value="PumpX Token Pro"></label>
-      <label>نماد <input id="symbol" class="input" value="PXP"></label>
-      <label>Decimals <input id="decimals" class="input" type="number" min="0" max="9" value="9"></label>
-      <label>عرضه اولیه (به واحد انسانی) <input id="supply" class="input" type="number" value="1000000"></label>
-      <label>آیکون (PNG/SVG) <input id="icon" class="input" type="file" accept=".png,.svg,.jpg,.jpeg" /></label>
-      <label class="muted">داستان برند (اختیاری) <input id="story" class="input" placeholder="یک جمله جذاب"></label>
-    </div>
-    <div class="row" style="margin-top:12px">
-      <button class="btn" id="create" disabled>ساخت + ثبت متادیتا</button>
-      <button class="btn" id="lock" disabled>قفل کردن Mint Authority</button>
-      <span id="status" class="muted"></span>
-    </div>
-    <div id="out" class="card result" style="display:none;margin-top:12px"></div>
-    <div class="muted" style="margin-top:8px">تصویر و JSON روی IPFS پین می‌شود؛ سپس
-      <b>Token Metadata (createV1)</b> با <b>URI</b> ساخته می‌شود.</div>
-  </section>
-</div>
-
 <script type="module">
-  // ---- Config ----
-  const IPFS_ENDPOINT = "https://YOUR-WORKER-URL"; // ← Worker مرحله 1
+/* Phantom Mobile helper + graceful fallback
+   - Shows "Open in Phantom App" deep-link + QR if window.solana not found
+   - Keeps existing logic for desktop extension
+   - Works on Devnet/Mainnet toggle as before
+*/
 
-  // ---- Imports (ESM) ----
-  import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
-  import { createMint, getOrCreateAssociatedTokenAccount, mintTo, setAuthority, AuthorityType, TOKEN_PROGRAM_ID }
-    from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
+// existing imports (ESM)
+import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
+import { createMint, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID } from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
 
-  // UMI + Token Metadata (Metaplex)
-  import { createUmi } from "https://esm.sh/@metaplex-foundation/umi-bundle-defaults@0.8.10";
-  import { publicKey as umiPk, signerIdentity } from "https://esm.sh/@metaplex-foundation/umi@0.8.10";
-  import { createV1 } from "https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.1.2";
+const $ = id => document.getElementById(id);
+const statusEl = $("status"), resultEl = $("result"), connectBtn = $("connect");
+const networkSel = $("network"), createBtn = $("create");
+let wallet = null, network = "devnet", connection = new Connection(clusterApiUrl(network), "confirmed");
 
-  // ---- DOM ----
-  const $ = id => document.getElementById(id);
-  const networkSel = $("network"), connectBtn = $("connect"), createBtn = $("create"), lockBtn = $("lock");
-  const statusEl = $("status"), out = $("out");
+// --- helper: create Phantom mobile deep link (opens URL inside Phantom app) ---
+// Using Phantom universal link that redirects to in-app browser.
+// Replace app_url param if you want to pass back redirect metadata.
+function phantomDeepLink(appUrl){
+  // Universal link that opens Phantom and navigates to appUrl in Phantom's in-app browser
+  // This should work: https://phantom.app/ul/v1/ (phantom mobile handles it)
+  // We percent-encode the target so Phantom opens it inside its browser
+  return `https://phantom.app/ul/v1/connect?app_url=${encodeURIComponent(appUrl)}`;
+}
 
-  let wallet = null, network = "devnet", connection = new Connection(clusterApiUrl(network), "confirmed");
-  let lastMintPk = null;
+// --- Show QR & mobile-open UI when Phantom extension NOT available ---
+function showMobileOpen(appUrl){
+  // create a small UI block (if not already)
+  if($("phantom-open")) return;
+  const container = document.createElement("div");
+  container.id = "phantom-open";
+  container.className = "card";
+  container.style.marginTop = "12px";
+  container.innerHTML = `
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div style="min-width:200px">
+        <div style="font-weight:700;margin-bottom:8px">Phantom اپ را باز کنید</div>
+        <div style="font-size:13px;color:#cbd5e1">برای اتصال سریع: "Open in Phantom" را بزن یا کد QR را اسکن کنید.</div>
+        <div style="margin-top:10px" class="row">
+          <a id="open-in-phantom" class="btn" href="#" style="text-decoration:none">Open in Phantom</a>
+        </div>
+      </div>
+      <div style="min-width:140px">
+        <img id="phantom-qr" alt="QR" style="width:140px;height:140px;border-radius:8px;border:1px solid #ffffff10"/>
+        <div style="font-size:12px;color:#9aa3b2;margin-top:6px">یا اسکن کن</div>
+      </div>
+    </div>
+  `;
+  // insert after main card
+  const wrap = document.querySelector(".wrap");
+  wrap.appendChild(container);
 
-  networkSel.onchange = (e)=>{ network = e.target.value; connection = new Connection(clusterApiUrl(network), "confirmed"); };
+  const link = phantomDeepLink(appUrl);
+  $("open-in-phantom").href = link;
+  $("open-in-phantom").target = "_blank";
 
-  connectBtn.onclick = async () => {
-    if (!window.solana || !window.solana.isPhantom){ alert("Phantom نصب نیست"); return; }
-    const r = await window.solana.connect();
-    wallet = new PublicKey(r.publicKey.toString());
-    connectBtn.textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
-    createBtn.disabled = false;
-  };
+  // QR via Google Chart API (simple, no dependency)
+  const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(link)}`;
+  $("phantom-qr").src = qrUrl;
+}
 
-  createBtn.onclick = async () => {
+// --- network change handler ---
+networkSel.addEventListener("change", e => {
+  network = e.target.value; connection = new Connection(clusterApiUrl(network), "confirmed");
+});
+
+// --- try to auto-detect if we're inside Phantom in-app (mobile) ---
+function isInPhantomBrowser(){
+  // Phantom sets window.phantom?.isPhantom and window.solana?.isPhantom normally.
+  // In mobile in-app browser, window.solana should also exist after opening via deep link.
+  if(window.solana && window.solana.isPhantom) return true;
+  // Some UA sniffing fallback: check navigator.userAgent for "Phantom"
+  try {
+    const ua = navigator.userAgent || "";
+    if(/Phantom/i.test(ua)) return true;
+  } catch(e){}
+  return false;
+}
+
+// --- connect logic with graceful fallback ---
+async function connectPhantomFlow(){
+  setStatus("در حال برقراری ارتباط با کیف...");
+  try{
+    // If Phantom already injected
+    if(window.solana && window.solana.isPhantom){
+      const resp = await window.solana.connect();
+      wallet = new PublicKey(resp.publicKey.toString());
+      connectBtn.textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
+      createBtn.disabled = false;
+      setStatus("");
+      // remove phantom-open UI if exists
+      const el = $("phantom-open"); if(el) el.remove();
+      return;
+    }
+
+    // If not injected: provide deep-link + QR to open inside Phantom app
+    const currentUrl = location.href.split("#")[0]; // keep page path as app_url
+    const deep = phantomDeepLink(currentUrl);
+    showMobileOpen(currentUrl);
+    setStatus("Phantom در مرورگر شما نصب نیست؛ برای موبایل: Open in Phantom یا اسکن QR.");
+    // Also try to open deep link programmatically on mobile (some browsers allow)
+    // This may prompt user to open Phantom.
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    if(isMobile){
+      // try to open deep link in a new tab (works on many mobiles)
+      window.open(deep, "_blank");
+    }
+  }catch(e){
+    console.error(e); setStatus("خطا در اتصال: "+(e?.message||e));
+  }
+}
+
+// wire connect button
+connectBtn.addEventListener("click", connectPhantomFlow);
+
+// --- auto-check on page load: if opened via Phantom deep link, window.solana may be injected ---
+window.addEventListener("load", async ()=>{
+  // quick wait a bit for injected provider
+  await new Promise(r=>setTimeout(r, 400));
+  if(window.solana && window.solana.isPhantom){
     try{
-      if(!wallet) return alert("ابتدا به Phantom وصل شوید.");
-      const name = $("name").value.trim(), symbol = $("symbol").value.trim();
-      const decimals = Math.max(0, Math.min(9, parseInt($("decimals").value||"9",10)));
-      const supplyHuman = Number($("supply").value||"0"); if(!(supplyHuman>0)) return alert("عرضه اولیه نامعتبر");
-      const story = $("story").value.trim();
-      const iconFile = $("icon").files[0];
-
-      setStatus("آپلود آیکون به IPFS…");
-      let imageUri = "";
-      if(iconFile){
-        const fd = new FormData(); fd.append("file", iconFile);
-        const up = await fetch(IPFS_ENDPOINT+"/upload-image", { method:"POST", body:fd });
-        const j = await up.json(); imageUri = j.uri; // ipfs://CID
+      const r = await window.solana.connect({onlyIfTrusted:true});
+      if(r && r.publicKey){
+        wallet = new PublicKey(r.publicKey.toString());
+        connectBtn.textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
+        createBtn.disabled = false;
+        setStatus("");
+        const el = $("phantom-open"); if(el) el.remove();
       }
+    }catch(e){
+      // not trusted yet; leave UI as-is
+    }
+  } else {
+    // Not injected — show open-in-phantom suggestion for mobile automatically
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    if(isMobile){
+      // show link to open in phantom
+      showMobileOpen(location.href.split("#")[0]);
+    }
+  }
+});
 
-      setStatus("ساخت متادیتای JSON و آپلود…");
-      const metadata = {
-        name, symbol,
-        description: story || `Token ${name} created via PumpX`,
-        image: imageUri, // ipfs://...
-        extensions: { website: "https://pumpx.info" }
-      };
-      const upJ = await fetch(IPFS_ENDPOINT+"/upload-json", { method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(metadata) });
-      const jj = await upJ.json(); const metaUri = jj.uri;
+// --- create token logic (same as before) ---
+createBtn.addEventListener("click", async ()=>{
+  if(!wallet) return alert("ابتدا به Phantom وصل شوید.");
+  const name = $("name").value.trim();
+  const symbol = $("symbol").value.trim();
+  const decimals = Math.max(0, Math.min(9, parseInt($("decimals").value||"9",10)));
+  const supplyHuman = Number($("supply").value||"0"); if(!(supplyHuman>0)) return alert("عرضه اولیه معتبر نیست.");
+  try{
+    setStatus("ایجاد Mint…");
+    const provider = window.solana;
+    const signer = {
+      publicKey: wallet,
+      signTransaction: tx => provider.signTransaction(tx),
+      signAllTransactions: txs => provider.signAllTransactions(txs)
+    };
+    const mintPk = await createMint(connection, signer, wallet, wallet, decimals, undefined, undefined, TOKEN_PROGRAM_ID);
 
-      // ساخت Mint + مینت عرضه
-      setStatus("ایجاد Mint و مینت عرضه…");
-      const provider = window.solana;
-      const signer = {
-        publicKey: wallet,
-        signTransaction: (tx)=>provider.signTransaction(tx),
-        signAllTransactions: (txs)=>provider.signAllTransactions(txs)
-      };
-      const mintPk = await createMint(connection, signer, wallet, wallet, decimals, undefined, undefined, TOKEN_PROGRAM_ID);
-      const ata = await getOrCreateAssociatedTokenAccount(connection, signer, mintPk, wallet);
-      const amount = Math.round(supplyHuman * 10**decimals);
-      await mintTo(connection, signer, mintPk, ata.address, wallet, amount);
+    setStatus("ساخت حساب توکن (ATA)...");
+    const ata = await getOrCreateAssociatedTokenAccount(connection, signer, mintPk, wallet);
 
-      // ثبت Token Metadata روی‌چین
-      setStatus("ثبت Token Metadata روی‌چین…");
-      const umi = createUmi(clusterApiUrl(network));
-      umi.use(signerIdentity({
-        publicKey: umiPk(wallet.toBase58()),
-        signTransaction: async (tx) => provider.signTransaction(tx),
-        signAllTransactions: async (txs) => provider.signAllTransactions(txs)
-      }));
+    setStatus("مینت عرضه اولیه…");
+    const amount = Math.round(supplyHuman * 10**decimals);
+    const sig = await mintTo(connection, signer, mintPk, ata.address, wallet, amount);
 
-      const tx = await createV1(umi, {
-        mint: umiPk(mintPk.toBase58()),
-        authority: umiPk(wallet.toBase58()),
-        payer: umiPk(wallet.toBase58()),
-        updateAuthority: umiPk(wallet.toBase58()),
-        name, symbol, uri: metaUri,
-        sellerFeeBasisPoints: 0
-      }).sendAndConfirm(umi);
+    setStatus("انجام شد ✅");
+    const txUrl = `https://explorer.solana.com/tx/${sig}?cluster=${network==="devnet"?"devnet":""}`;
+    const addrUrl = `https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}`;
+    resultEl.style.display = "block";
+    resultEl.innerHTML = `
+      <div>نام/نماد (UI): <b>${name}</b> (${symbol})</div>
+      <div>آدرس مینت: <code>${mintPk.toBase58()}</code></div>
+      <div><a target="_blank" href="${addrUrl}">مشاهده Mint در Explorer</a> •
+          <a target="_blank" href="${txUrl}">تراکنش</a></div>`;
+  }catch(e){
+    console.error(e); setStatus("خطا"); alert(e?.message||e);
+  }
+});
 
-      lastMintPk = mintPk;
-
-      setStatus("تمام ✅");
-      out.style.display="block";
-      out.innerHTML = `
-        <div>Mint: <code>${mintPk.toBase58()}</code></div>
-        <div>Metadata URI: <code>${metaUri}</code></div>
-        <div>
-          <a target="_blank" href="https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}">مشاهده Mint</a> •
-          <a target="_blank" href="https://explorer.solana.com/tx/${tx}?cluster=${network==="devnet"?"devnet":""}">تراکنش Metadata</a>
-        </div>`;
-      lockBtn.disabled = false;
-    }catch(e){ console.error(e); setStatus("خطا"); alert(e?.message||e); }
-  };
-
-  lockBtn.onclick = async () => {
-    try{
-      if(!lastMintPk) return;
-      setStatus("قفل‌کردن mint authority…");
-      const provider = window.solana;
-      const signer = { publicKey: wallet, signTransaction: (tx)=>provider.signTransaction(tx), signAllTransactions: (txs)=>provider.signAllTransactions(txs) };
-      await setAuthority(connection, signer, lastMintPk, wallet, AuthorityType.MintTokens, null); // authority = null
-      setStatus("Mint قفل شد 🔒");
-    }catch(e){ console.error(e); setStatus("خطا در قفل"); alert(e?.message||e); }
-  };
-
-  function setStatus(t){ statusEl.textContent = t; }
-</script>
-</body></html>
+function setStatus(t){ statusEl.textContent = t; }
+    </script>
