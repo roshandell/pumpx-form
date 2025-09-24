@@ -2,80 +2,23 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>ساخت توکن | PumpX</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      background-color: #0F121D;
-      color: white;
-      font-family: sans-serif;
-      padding: 2rem;
-      max-width: 600px;
-      margin: auto;
-    }
-    input, textarea, button {
-      display: block;
-      margin: 1rem 0;
-      padding: 0.7rem;
-      width: 100%;
-      border-radius: 6px;
-      border: none;
-      font-size: 1rem;
-    }
-    button {
-      background-color: #29ABE2;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-  </style>
+  <title>PumpX | ساخت توکن</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <h1>ساخت توکن جدید</h1>
 
-  <input type="text" id="name" placeholder="نام توکن">
-  <input type="text" id="symbol" placeholder="نماد توکن">
-  <input type="number" id="supply" placeholder="عرضه کل">
-  <textarea id="description" placeholder="توضیحات"></textarea>
-  <input type="text" id="logo" placeholder="نام فایل لوگو (اختیاری)">
-  <button onclick="createToken()">ساخت توکن</button>
+  <button onclick="connectWallet()">اتصال به کیف پول</button>
 
-  <script>
-    function createToken() {
-      const name = document.getElementById("name").value;
-      const symbol = document.getElementById("symbol").value;
-      const supply = document.getElementById("supply").value;
-      const description = document.getElementById("description").value;
-      const logo = document.getElementById("logo").value;
+  <form id="tokenForm">
+    <input type="text" placeholder="نام توکن" id="name" required>
+    <input type="text" placeholder="نماد توکن" id="symbol" required>
+    <input type="number" placeholder="عرضه کل" id="supply" required>
+    <textarea placeholder="توضیحات" id="description"></textarea>
+    <input type="text" placeholder="نام فایل لوگو (اختیاری)" id="logo">
+    <button type="submit">ساخت توکن</button>
+  </form>
 
-      fetch("https://pumpx-api.onrender.com/api/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name,
-          symbol,
-          supply,
-          description,
-          logo
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        alert("✅ توکن ساخته شد: " + data.name);
-      })
-      .catch(err => {
-        alert("❌ خطا در ساخت توکن");
-        console.error(err);
-      });
-    }
-  </script>
-
+  <script src="script.js"></script>
 </body>
 </html>
