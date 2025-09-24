@@ -3,426 +3,206 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>PumpX • Token Creator Pro + AI</title>
+  <title>PumpX • Token Creator + Wallet Diagnostics</title>
   <link rel="preconnect" href="https://esm.sh"/>
   <style>
     :root{--bg:#0b0f1a;--card:#0f1524;--line:#23304c}
     *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,"Noto Sans Arabic",sans-serif;background:var(--bg);color:#fff}
     a{color:#79d9ff}
-    .wrap{max-width:1200px;margin:auto;padding:22px}
+    .wrap{max-width:1100px;margin:auto;padding:22px}
     .nav{position:sticky;top:0;z-index:40;background:#0b0f1acc;border-bottom:1px solid #ffffff18;backdrop-filter:blur(10px)}
     .navin{display:flex;justify-content:space-between;align-items:center;height:64px}
     .btn{background:linear-gradient(90deg,#12f0ff44,#7a5cff33,#ff3ef633);border:1px solid #ffffff22;padding:10px 14px;border-radius:12px;color:#fff;cursor:pointer}
     .btn:disabled{opacity:.5;cursor:not-allowed}
-    .select,.input,.textarea{background:#121a2c;border:1px solid var(--line);color:#fff;border-radius:12px;padding:10px 12px}
-    .textarea{min-height:92px;resize:vertical}
+    .select,.input{background:#121a2c;border:1px solid var(--line);color:#fff;border-radius:12px;padding:10px 12px}
     .card{background:#0f1524cc;border:1px solid #ffffff22;border-radius:18px;padding:16px;box-shadow:0 10px 40px #0006;margin-top:16px}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}}
     .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .muted{opacity:.8;font-size:13px}
-    .result{word-break:break-all}
-    .two{display:grid;grid-template-columns:2fr 1fr;gap:16px}
-    @media(max-width:900px){.two{grid-template-columns:1fr}}
-    .chip{padding:6px 10px;border-radius:999px;border:1px solid #ffffff22;background:#ffffff10;font-size:12px}
-    .preview{border:1px solid #ffffff22;border-radius:14px;padding:10px;background:#0b0f1a}
+    .code{background:#0b0f1a;border:1px solid #ffffff22;border-radius:10px;padding:8px 10px;word-break:break-all}
   </style>
 </head>
 <body>
+<!-- NAV -->
 <div class="nav"><div class="wrap navin">
-  <div style="font-weight:900;letter-spacing:.12em">PumpX • Token Creator Pro + AI</div>
+  <div style="font-weight:900;letter-spacing:.12em">PumpX • Token Creator</div>
   <div class="row">
     <select id="network" class="select">
       <option value="devnet" selected>Devnet</option>
       <option value="mainnet-beta">Mainnet</option>
     </select>
     <button id="connect" class="btn">اتصال Phantom</button>
+    <button id="disconnect" class="btn" style="display:none">قطع اتصال</button>
   </div>
 </div></div>
 
 <div class="wrap">
-  <!-- 1) Base form -->
+  <!-- DIAGNOSTICS -->
   <section class="card">
-    <h2 style="margin:0 0 10px">۱) تنظیمات پایه و متادیتا</h2>
+    <h2 style="margin:0 0 10px">وضعیت کیف‌پول / شبکه</h2>
     <div class="grid">
-      <label>نام (روی‌چین) <input id="name" class="input" value="PumpX Token Pro"></label>
-      <label>نماد <input id="symbol" class="input" value="PXP"></label>
-      <label>Decimals <input id="decimals" class="input" type="number" min="0" max="9" value="9"></label>
-      <label>عرضه اولیه (به واحد انسانی) <input id="supply" class="input" type="number" value="1000000"></label>
-      <label>آیکون (PNG/SVG/JPG) <input id="icon" class="input" type="file" accept=".png,.svg,.jpg,.jpeg"/></label>
-      <label>NFT.Storage API Token <input id="nftkey" class="input" placeholder="برای آپلود IPFS ضروری است"/></label>
-      <label class="muted" style="grid-column:1/-1">داستان/توضیحات توکن (برای صفحه/متادیتا)
-        <textarea id="story" class="textarea" placeholder="یک متن کوتاه برند-محور"></textarea>
-      </label>
+      <div>
+        <div class="muted">Provider:</div>
+        <div id="prov" class="code">در حال تشخیص…</div>
+      </div>
+      <div>
+        <div class="muted">HTTPS:</div>
+        <div id="httpsOk" class="code">—</div>
+      </div>
+      <div>
+        <div class="muted">آدرس کیف:</div>
+        <div id="addr" class="code">—</div>
+      </div>
+      <div>
+        <div class="muted">موجودی (SOL):</div>
+        <div id="bal" class="code">—</div>
+      </div>
     </div>
     <div class="muted" style="margin-top:8px">
-      اگر NFT.Storage خالی باشد، فقط Mint و عرضه اولیه انجام می‌شود. با واردکردن توکن، <b>تصویر و JSON متادیتا</b> روی IPFS آپلود و سپس <b>Token Metadata</b> روی‌چین ثبت می‌شود.
+      اگر دسکتاپ هستی: افزونه Phantom باید نصب و Unlock باشد. اگر موبایل هستی باید صفحه را داخل اپ Phantom باز کنی.
     </div>
   </section>
 
-  <!-- 2) AI assistant -->
+  <!-- TOKEN FORM -->
   <section class="card">
-    <h2 style="margin:0 0 10px">۲) دستیار هوش مصنوعی (نام/نماد/استوری + تحلیل ریسک + آیکون SVG)</h2>
-    <div class="two">
-      <div>
-        <div class="grid">
-          <label>OpenAI API Key
-            <input id="openai" class="input" placeholder="sk-..." />
-          </label>
-          <label>تم/فضا (Theme)
-            <input id="theme" class="input" value="میم/جامعه/هایپ" />
-          </label>
-          <label>لحن (Tone)
-            <input id="tone" class="input" value="جسور، جهانی، قابل‌اعتماد" />
-          </label>
-          <label>کلیدواژه‌ها (اختیاری)
-            <input id="seeds" class="input" placeholder="energy, viral, neon"/>
-          </label>
-          <label class="muted" style="grid-column:1/-1">توضیحات (برای تحلیل ریسک)
-            <textarea id="desc" class="textarea" placeholder="اینجا توضیح توکن/پیشنهادها/قول‌ها..."></textarea>
-          </label>
-        </div>
-        <div class="row" style="margin-top:10px">
-          <button id="aiBrand" class="btn">پیشنهاد نام/نماد/استوری</button>
-          <button id="aiRisk" class="btn">تحلیل ریسک توضیحات</button>
-          <button id="aiIcon" class="btn">ساخت آیکون SVG بر اساس نماد</button>
-          <span id="aiStatus" class="muted"></span>
-        </div>
-        <div id="riskOut" class="card" style="display:none;margin-top:10px"></div>
-      </div>
-
-      <div>
-        <div class="muted">پیش‌نمایش آیکون AI</div>
-        <div id="iconPreview" class="preview" style="min-height:160px;display:grid;place-items:center">—</div>
-        <div class="muted" style="margin-top:8px">
-          اگر NFT.Storage Token را وارد کرده باشی، این SVG به‌صورت خودکار روی IPFS آپلود و در متادیتا استفاده می‌شود (در صورت نبود فایل دستی).
-        </div>
-      </div>
+    <h2 style="margin:0 0 10px">فرم ساخت توکن</h2>
+    <div class="grid">
+      <label>نام (UI) <input id="name" class="input" value="PumpX Token"/></label>
+      <label>نماد <input id="symbol" class="input" value="PXP"/></label>
+      <label>Decimals <input id="decimals" class="input" type="number" min="0" max="9" value="9"/></label>
+      <label>عرضه اولیه (به واحد انسانی) <input id="supply" class="input" type="number" value="1000000"/></label>
     </div>
-  </section>
-
-  <!-- 3) On-chain -->
-  <section class="card">
-    <h2 style="margin:0 0 10px">۳) ساخت و ثبت روی زنجیره</h2>
-    <div class="row">
-      <button class="btn" id="create" disabled>ساخت + (اختیاری) آپلود IPFS + Metadata</button>
-      <button class="btn" id="lock" disabled>قفل کردن Mint Authority</button>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="create" disabled>ساخت توکن</button>
       <span id="status" class="muted"></span>
     </div>
-    <div id="out" class="card result" style="display:none;margin-top:12px"></div>
-    <div id="mobileHelp" class="card" style="display:none;margin-top:12px">
-      <div class="row">
-        <a id="openPhantom" class="btn" target="_blank">Open in Phantom</a>
-        <a class="btn" href="https://phantom.app/download" target="_blank">نصب Phantom</a>
-        <span class="muted">برای موبایل، صفحه را داخل اپ Phantom باز کن.</span>
-      </div>
-    </div>
+    <div id="out" class="card" style="display:none;margin-top:12px"></div>
+    <div class="muted" style="margin-top:8px">Devnet را در Phantom انتخاب کن و از فاست کمی SOL بگیر.</div>
   </section>
 </div>
 
 <script type="module">
-/* ---------- Imports (no build) ---------- */
 import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
-import { createMint, getOrCreateAssociatedTokenAccount, mintTo, setAuthority, AuthorityType, TOKEN_PROGRAM_ID } from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
-import { createUmi } from "https://esm.sh/@metaplex-foundation/umi-bundle-defaults@0.8.10";
-import { publicKey as umiPk, signerIdentity } from "https://esm.sh/@metaplex-foundation/umi@0.8.10";
-import { createV1 } from "https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.1.2";
+import { createMint, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID } from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
 
-/* ---------- DOM ---------- */
-const $ = id=>document.getElementById(id);
-const statusEl=$("status"), out=$("out"), mobileHelp=$("mobileHelp");
-const connectBtn=$("connect"), createBtn=$("create"), lockBtn=$("lock"), netSel=$("network");
-const iconPreview=$("iconPreview"), riskOut=$("riskOut"), aiStatus=$("aiStatus");
-const btnBrand=$("aiBrand"), btnRisk=$("aiRisk"), btnIcon=$("aiIcon");
-const openPhantom=$("openPhantom");
+const $ = id => document.getElementById(id);
+const statusEl = $("status"), outEl = $("out");
+const connectBtn = $("connect"), disconnectBtn = $("disconnect"), createBtn = $("create");
+const netSel = $("network"), provEl=$("prov"), httpsEl=$("httpsOk"), addrEl=$("addr"), balEl=$("bal");
 
-/* ---------- State ---------- */
-let provider=null, wallet=null, network="devnet";
+let provider = null, wallet = null, network = "devnet";
 let connection = new Connection(clusterApiUrl(network), "confirmed");
-let lastMint=null;
-let aiIconDataUrl=null; // اگر فایل کاربر نبود از این استفاده می‌کنیم
-const setStatus = (t)=> statusEl.textContent = t || "";
 
-/* ---------- Provider helpers ---------- */
-const getProvider=()=>{
-  const w=window;
+function setStatus(t){ statusEl.textContent = t || ""; }
+function getProvider(){
+  const w = window;
+  // جدید
   if (w?.phantom?.solana?.isPhantom) return w.phantom.solana;
+  // قدیمی
   if (w?.solana?.isPhantom) return w.solana;
   return null;
-};
-const phantomOpenLink = (url)=> `https://phantom.app/ul/browse?url=${encodeURIComponent(url)}`;
-function showMobile(){
-  mobileHelp.style.display="block";
-  openPhantom.href = phantomOpenLink(location.href.split("#")[0]);
 }
+function short(pk){ return pk ? pk.slice(0,4)+"…"+pk.slice(-4) : "—"; }
 
-/* ---------- NFT.Storage upload ---------- */
-async function uploadToNFTStorage(fileOrBlob, apiToken){
-  const r = await fetch("https://api.nft.storage/upload", { method:"POST", headers:{ "Authorization":"Bearer "+apiToken }, body: fileOrBlob });
-  if(!r.ok) throw new Error("NFT.Storage upload failed");
-  const j = await r.json(); if(!j.ok || !j.value?.cid) throw new Error("Invalid upload response");
-  return "ipfs://"+j.value.cid;
-}
-
-/* ---------- AI (OpenAI or fallback) ---------- */
-async function aiChat(apiKey, prompt){
-  if(!apiKey){
-    // fallback بسیار ساده
-    const seeds=["Nova","Flux","Pulse","Astra","Neon","Kinetic","Vortex","Echo","Quark","Hyper"];
-    const pick=()=>seeds[Math.random()*seeds.length|0];
-    const name = `${pick()} ${$("name").value || "Token"}`.trim();
-    const symbol = ( ($("symbol").value||"PX") + pick().slice(0,1) ).toUpperCase().slice(0,4);
-    const story = `توکن ${name} با تمرکز بر جامعه و رشد سالم طراحی شده است.`;
-    const risks = ["قول سود تضمینی نده","قفل نقدینگی را اعلام کن","توزیع شفاف"];
-    return {name,symbol,story,risks};
-  }
-  const r = await fetch("https://api.openai.com/v1/chat/completions", {
-    method:"POST",
-    headers:{ "content-type":"application/json", "authorization":"Bearer "+apiKey },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        { role:"system", content:"You are a Solana token launch assistant. Return concise JSON." },
-        { role:"user", content: prompt }
-      ],
-      temperature: 0.8
-    })
-  });
-  const j = await r.json();
-  const text = j?.choices?.[0]?.message?.content || "";
-  // تلاش برای پیدا کردن JSON از متن:
-  const m = text.match(/\{[\s\S]*\}/);
-  try { return JSON.parse(m?m[0]:text); } catch { return { raw:text }; }
-}
-
-function makeBrandPrompt(){
-  const theme = $("theme").value || "";
-  const tone  = $("tone").value || "";
-  const seeds = $("seeds").value || "";
-  const want  = `Make 3 strong options for: name (<=16 chars), symbol (2-4 latin caps), and a 1-sentence brand story. Style: ${tone}. Theme: ${theme}. Seeds: ${seeds}. Return JSON like {"options":[{"name":"","symbol":"","story":""},...]}.`;
-  return want;
-}
-
-function makeRiskPrompt(){
-  const desc = $("desc").value || $("story").value || "";
-  return `Analyze this token description for risk/compliance issues. Return JSON: {"warnings":["..."], "trust_boosters":["..."]}. Text: ${desc}`;
-}
-
-// آیکون SVG نئونی بر اساس نماد
-function generateIconSVG(symbol="PX"){
-  const s = symbol.trim().slice(0,2).toUpperCase();
-  return `
-  <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-    <defs>
-      <radialGradient id="rg" cx="35%" cy="30%" r="80%">
-        <stop offset="0%" stop-color="#12f0ff"/>
-        <stop offset="55%" stop-color="#7a5cff"/>
-        <stop offset="100%" stop-color="#ff3ef6"/>
-      </radialGradient>
-      <filter id="glow"><feGaussianBlur stdDeviation="8"/></filter>
-    </defs>
-    <rect width="512" height="512" rx="96" fill="#0b0f1a"/>
-    <circle cx="256" cy="220" r="180" fill="url(#rg)" opacity="0.22"/>
-    <text x="50%" y="58%" text-anchor="middle" font-family="Poppins, Inter, system-ui" font-size="200" font-weight="900" fill="#ffffff" filter="url(#glow)">${s}</text>
-    <text x="50%" y="58%" text-anchor="middle" font-family="Poppins, Inter, system-ui" font-size="200" font-weight="900" fill="#ffffff">${s}</text>
-  </svg>`;
-}
-function svgToDataUrl(svg){ return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); }
-
-/* ---------- Wire AI buttons ---------- */
-btnBrand.onclick = async ()=>{
-  aiStatus.textContent = "در حال تولید...";
-  const key = $("openai").value.trim();
+async function refreshBalance(){
   try{
-    const out = await aiChat(key, makeBrandPrompt());
-    // اگر options داشت، یکی رو انتخاب کنیم:
-    let opt = out?.options?.[0] || out;
-    if(Array.isArray(out?.options) && out.options.length>1){
-      // انتخاب بهترین کوتاه/تیز
-      opt = out.options.sort((a,b)=> (a?.name?.length||99) - (b?.name?.length||99))[0];
-    }
-    if(opt?.name)  $("name").value   = opt.name;
-    if(opt?.symbol)$("symbol").value = opt.symbol;
-    if(opt?.story) $("story").value  = opt.story;
-    aiStatus.textContent = "اعمال شد ✅";
-  }catch(e){ console.error(e); aiStatus.textContent="خطا در AI"; alert(e?.message||e); }
-};
+    if(!wallet) { balEl.textContent = "—"; return; }
+    const lamports = await connection.getBalance(new PublicKey(wallet));
+    balEl.textContent = (lamports/1e9).toFixed(4);
+  }catch{ balEl.textContent = "خطا" }
+}
 
-btnRisk.onclick = async ()=>{
-  aiStatus.textContent = "تحلیل ریسک...";
-  const key = $("openai").value.trim();
-  try{
-    const out = await aiChat(key, makeRiskPrompt());
-    const warns = out?.warnings || out?.risks || [];
-    const boosts= out?.trust_boosters || [];
-    riskOut.style.display="block";
-    riskOut.innerHTML = `
-      <div><b>هشدارها:</b><ul>${warns.map(x=>`<li>${x}</li>`).join("") || "<li>موردی گزارش نشد</li>"}</ul></div>
-      <div><b>تقویت اعتماد:</b><ul>${boosts.map(x=>`<li>${x}</li>`).join("") || "<li>—</li>"}</ul></div>
-    `;
-    aiStatus.textContent = "تمام شد ✅";
-  }catch(e){ console.error(e); aiStatus.textContent="خطا در AI"; alert(e?.message||e); }
-};
-
-btnIcon.onclick = ()=>{
-  const sym = $("symbol").value || "PX";
-  const svg = generateIconSVG(sym);
-  aiIconDataUrl = svgToDataUrl(svg);
-  iconPreview.innerHTML = `<img src="${aiIconDataUrl}" alt="icon" style="width:160px;height:160px;border-radius:24px;border:1px solid #ffffff22;background:#0b0f1a"/>`;
-  aiStatus.textContent = "آیکون آماده شد ✅";
-};
-
-/* ---------- Network / Connect / Auto ---------- */
-netSel.addEventListener("change", e=>{
-  network=e.target.value;
-  connection = new Connection(clusterApiUrl(network), "confirmed");
-});
-
-async function tryConnect(onlyIfTrusted=false){
+async function connect(onlyIfTrusted=false){
   provider = getProvider();
+  provEl.textContent = provider ? (provider === window?.phantom?.solana ? "window.phantom.solana ✅" : "window.solana ✅") : "پیدا نشد ❌";
   if(!provider){
-    setStatus("Phantom شناسایی نشد.");
-    if(/Mobi|Android|iPhone/i.test(navigator.userAgent)) showMobile();
+    if(!location.protocol.startsWith("https")) setStatus("صفحه باید با HTTPS باز شود.");
     return false;
   }
   try{
-    const resp = await provider.connect(onlyIfTrusted?{onlyIfTrusted:true}:{});
-    wallet = new PublicKey(resp.publicKey.toString());
-    connectBtn.textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
+    const resp = await provider.connect( onlyIfTrusted ? {onlyIfTrusted:true} : {} );
+    wallet = resp.publicKey.toString();
+    connectBtn.textContent = "متصل: " + short(wallet);
+    connectBtn.style.display = "none";
+    disconnectBtn.style.display = "inline-block";
     createBtn.disabled = false;
+    addrEl.textContent = wallet;
+    await refreshBalance();
     setStatus("");
-    mobileHelp.style.display="none";
     return true;
   }catch(e){
-    setStatus(e?.message||"اتصال لغو شد");
+    setStatus(e?.message || "اتصال لغو شد");
     return false;
   }
 }
-connectBtn.addEventListener("click", async ()=>{
-  if (!getProvider() && !/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
-    window.open("https://phantom.app/download","_blank"); return;
-  }
-  await tryConnect(false);
+
+async function disconnect(){
+  try{ await provider?.disconnect?.(); }catch{}
+  wallet = null;
+  connectBtn.textContent = "اتصال Phantom";
+  connectBtn.style.display = "inline-block";
+  disconnectBtn.style.display = "none";
+  createBtn.disabled = true;
+  addrEl.textContent = "—";
+  balEl.textContent = "—";
+  setStatus("قطع شد");
+}
+
+netSel.addEventListener("change", async e=>{
+  network = e.target.value;
+  connection = new Connection(clusterApiUrl(network), "confirmed");
+  await refreshBalance();
 });
-document.addEventListener("visibilitychange", ()=>{
-  if(document.visibilityState==="visible" && !wallet) tryConnect(true);
-});
+
+connectBtn.addEventListener("click", ()=>connect(false));
+disconnectBtn.addEventListener("click", disconnect);
+
+// تلاش خودکار روی لود
 window.addEventListener("load", async ()=>{
-  await new Promise(r=>setTimeout(r,300));
-  await tryConnect(true);
-  if(!getProvider() && /Mobi|Android|iPhone/i.test(navigator.userAgent)) showMobile();
+  httpsEl.textContent = location.protocol.startsWith("https") ? "بله ✅" : "خیر ❌ (GitHub Pages با HTTPS باز کن)";
+  await new Promise(r=>setTimeout(r, 300));
+  await connect(true); // اگر اعتماد قبلی هست بی‌صدا وصل شود
+  if(!wallet) setStatus("برای اتصال کلیک کن. اگر دسکتاپی، افزونه باید نصب/Unlock باشد.");
 });
 
-/* ---------- Create token + metadata ---------- */
+// ساخت توکن
 createBtn.addEventListener("click", async ()=>{
-  if(!wallet || !provider) return alert("ابتدا به Phantom وصل شوید.");
-
+  if (!wallet || !provider) return alert("ابتدا به Phantom وصل شوید.");
   const name = $("name").value.trim();
   const symbol = $("symbol").value.trim();
   const decimals = Math.max(0, Math.min(9, parseInt($("decimals").value||"9",10)));
   const supplyHuman = Number($("supply").value||"0");
-  const story = $("story").value.trim();
-  const iconFile = $("icon").files[0] || null;
-  const nftKey = $("nftkey").value.trim();
-
-  if(!(supplyHuman>0)) return alert("عرضه اولیه معتبر نیست.");
+  if (!(supplyHuman>0)) return alert("عرضه اولیه معتبر نیست.");
 
   try{
     setStatus("ایجاد Mint…");
     const signer = {
-      publicKey: wallet,
-      signTransaction: (tx)=> provider.signTransaction(tx),
-      signAllTransactions: (txs)=> provider.signAllTransactions(txs)
+      publicKey: new PublicKey(wallet),
+      signTransaction: tx  => provider.signTransaction(tx),
+      signAllTransactions: txs => provider.signAllTransactions(txs)
     };
-    const mintPk = await createMint(connection, signer, wallet, wallet, decimals, undefined, undefined, TOKEN_PROGRAM_ID);
+    const mintPk = await createMint(connection, signer, new PublicKey(wallet), new PublicKey(wallet), decimals, undefined, undefined, TOKEN_PROGRAM_ID);
 
-    setStatus("ساخت حساب توکن (ATA)...");
-    const ata = await getOrCreateAssociatedTokenAccount(connection, signer, mintPk, wallet);
+    setStatus("ساخت ATA…");
+    const ata = await getOrCreateAssociatedTokenAccount(connection, signer, mintPk, new PublicKey(wallet));
 
     setStatus("مینت عرضه اولیه…");
     const amount = Math.round(supplyHuman * 10**decimals);
-    const sigMint = await mintTo(connection, signer, mintPk, ata.address, wallet, amount);
+    const sig = await mintTo(connection, signer, mintPk, ata.address, new PublicKey(wallet), amount);
 
-    let metaUri = "";
-    if(nftKey){
-      // 1) آیکون: یا فایل کاربر یا آیکون AI (SVG data URL)
-      let imageUri = "";
-      if(iconFile){
-        setStatus("آپلود آیکون روی IPFS…");
-        imageUri = await uploadToNFTStorage(iconFile, nftKey);
-      } else if (aiIconDataUrl){
-        const svgBlob = await (await fetch(aiIconDataUrl)).blob();
-        setStatus("آپلود آیکون AI روی IPFS…");
-        imageUri = await uploadToNFTStorage(svgBlob, nftKey);
-      }
-      // 2) JSON metadata
-      setStatus("آپلود JSON متادیتا روی IPFS…");
-      const meta = {
-        name, symbol,
-        description: story || `Token ${name} created via PumpX`,
-        image: imageUri || undefined,
-        attributes: [{trait_type:"creator", value: wallet.toBase58()}]
-      };
-      const blob = new Blob([JSON.stringify(meta)], {type:"application/json"});
-      metaUri = await uploadToNFTStorage(blob, nftKey);
-
-      // 3) ثبت Metadata روی‌چین
-      setStatus("ثبت Token Metadata روی‌چین…");
-      const umi = createUmi(clusterApiUrl(network));
-      umi.use(signerIdentity({
-        publicKey: umiPk(wallet.toBase58()),
-        signTransaction: async (tx)=> provider.signTransaction(tx),
-        signAllTransactions: async (txs)=> provider.signAllTransactions(txs)
-      }));
-      const txMeta = await createV1(umi, {
-        mint: umiPk(mintPk.toBase58()),
-        authority: umiPk(wallet.toBase58()),
-        payer: umiPk(wallet.toBase58()),
-        updateAuthority: umiPk(wallet.toBase58()),
-        name, symbol, uri: metaUri,
-        sellerFeeBasisPoints: 0
-      }).sendAndConfirm(umi);
-
-      setStatus("تمام شد ✅");
-      lastMint = mintPk;
-      lockBtn.disabled = false;
-      out.style.display="block";
-      out.innerHTML = `
-        <div><b>Mint:</b> <code>${mintPk.toBase58()}</code></div>
-        <div><b>Metadata URI:</b> <code>${metaUri}</code></div>
-        <div>
-          <a target="_blank" href="https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}">مشاهده Mint</a> •
-          <a target="_blank" href="https://explorer.solana.com/tx/${sigMint}?cluster=${network==="devnet"?"devnet":""}">تراکنش مینت</a>
-        </div>`;
-    } else {
-      setStatus("تمام شد (بدون Metadata) ✅ — برای ثبت متادیتا، NFT.Storage Token وارد کن");
-      lastMint = mintPk;
-      lockBtn.disabled = false;
-      out.style.display="block";
-      out.innerHTML = `
-        <div><b>Mint:</b> <code>${mintPk.toBase58()}</code></div>
-        <div>
-          <a target="_blank" href="https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}">مشاهده Mint</a> •
-          <a target="_blank" href="https://explorer.solana.com/tx/${sigMint}?cluster=${network==="devnet"?"devnet":""}">تراکنش مینت</a>
-        </div>
-        <div class="muted" style="margin-top:6px">برای متادیتا، آیکون AI بساز یا فایل انتخاب کن و NFT.Storage Token را وارد کن.</div>`;
-    }
+    await refreshBalance();
+    setStatus("انجام شد ✅");
+    const txUrl = `https://explorer.solana.com/tx/${sig}?cluster=${network==="devnet"?"devnet":""}`;
+    const addrUrl = `https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}`;
+    outEl.style.display = "block";
+    outEl.innerHTML = `
+      <div>نام/نماد (UI): <b>${name}</b> (${symbol})</div>
+      <div>Mint: <div class="code">${mintPk.toBase58()}</div></div>
+      <div><a target="_blank" href="${addrUrl}">مشاهده Mint</a> • <a target="_blank" href="${txUrl}">تراکنش</a></div>`;
   }catch(e){
     console.error(e);
-    setStatus("خطا"); alert(e?.message||e);
-  }
-});
-
-/* ---------- Lock mint authority ---------- */
-lockBtn.addEventListener("click", async ()=>{
-  if(!lastMint) return;
-  try{
-    setStatus("قفل‌کردن mint authority…");
-    const signer = { publicKey: wallet, signTransaction:(tx)=>provider.signTransaction(tx), signAllTransactions:(txs)=>provider.signAllTransactions(txs) };
-    await setAuthority(connection, signer, lastMint, wallet, AuthorityType.MintTokens, null);
-    setStatus("Mint قفل شد 🔒");
-  }catch(e){
-    console.error(e); setStatus("خطا در قفل"); alert(e?.message||e);
+    setStatus("خطا: "+(e?.message||e));
   }
 });
 </script>
