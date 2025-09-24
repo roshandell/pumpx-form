@@ -1,164 +1,117 @@
 <script type="module">
-/* Phantom Mobile helper + graceful fallback
-   - Shows "Open in Phantom App" deep-link + QR if window.solana not found
-   - Keeps existing logic for desktop extension
-   - Works on Devnet/Mainnet toggle as before
-*/
-
-// existing imports (ESM)
 import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
 import { createMint, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID } from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
 
 const $ = id => document.getElementById(id);
-const statusEl = $("status"), resultEl = $("result"), connectBtn = $("connect");
-const networkSel = $("network"), createBtn = $("create");
-let wallet = null, network = "devnet", connection = new Connection(clusterApiUrl(network), "confirmed");
+const statusEl = $("status"), resultEl = $("result");
+const connectBtn = $("connect"), createBtn = $("create"), netSel = $("network");
 
-// --- helper: create Phantom mobile deep link (opens URL inside Phantom app) ---
-// Using Phantom universal link that redirects to in-app browser.
-// Replace app_url param if you want to pass back redirect metadata.
-function phantomDeepLink(appUrl){
-  // Universal link that opens Phantom and navigates to appUrl in Phantom's in-app browser
-  // This should work: https://phantom.app/ul/v1/ (phantom mobile handles it)
-  // We percent-encode the target so Phantom opens it inside its browser
-  return `https://phantom.app/ul/v1/connect?app_url=${encodeURIComponent(appUrl)}`;
+let provider = null, wallet = null, network = "devnet";
+let connection = new Connection(clusterApiUrl(network), "confirmed");
+
+// --- Provider detection (robust) ---
+function getProvider() {
+  const w = window;
+  if (w?.phantom?.solana?.isPhantom) return w.phantom.solana;   // جدید
+  if (w?.solana?.isPhantom)            return w.solana;          // قدیمی
+  return null;
 }
+function setStatus(t){ statusEl.textContent = t || ""; }
 
-// --- Show QR & mobile-open UI when Phantom extension NOT available ---
-function showMobileOpen(appUrl){
-  // create a small UI block (if not already)
-  if($("phantom-open")) return;
-  const container = document.createElement("div");
-  container.id = "phantom-open";
-  container.className = "card";
-  container.style.marginTop = "12px";
-  container.innerHTML = `
+// --- Open in Phantom app (mobile deep-link) ---
+function phantomOpenLink(url){
+  // مرورگرِ داخل اپ Phantom
+  return `https://phantom.app/ul/browse?url=${encodeURIComponent(url)}`;
+}
+function showMobileHelp(){
+  if ($("phantom-help")) return;
+  const box = document.createElement("div");
+  box.id = "phantom-help";
+  box.className = "card";
+  box.style.marginTop = "12px";
+  box.innerHTML = `
     <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <div style="min-width:200px">
-        <div style="font-weight:700;margin-bottom:8px">Phantom اپ را باز کنید</div>
-        <div style="font-size:13px;color:#cbd5e1">برای اتصال سریع: "Open in Phantom" را بزن یا کد QR را اسکن کنید.</div>
-        <div style="margin-top:10px" class="row">
-          <a id="open-in-phantom" class="btn" href="#" style="text-decoration:none">Open in Phantom</a>
+      <div>
+        <div style="font-weight:700;margin-bottom:8px">اتصال موبایل</div>
+        <div style="font-size:13px;opacity:.8">این صفحه را داخل اپ Phantom باز کن.</div>
+        <div class="row" style="margin-top:8px">
+          <a id="open-phantom" class="btn" target="_blank">Open in Phantom</a>
+          <a class="btn" href="https://phantom.app/download" target="_blank">نصب Phantom</a>
         </div>
       </div>
-      <div style="min-width:140px">
-        <img id="phantom-qr" alt="QR" style="width:140px;height:140px;border-radius:8px;border:1px solid #ffffff10"/>
-        <div style="font-size:12px;color:#9aa3b2;margin-top:6px">یا اسکن کن</div>
-      </div>
-    </div>
-  `;
-  // insert after main card
-  const wrap = document.querySelector(".wrap");
-  wrap.appendChild(container);
-
-  const link = phantomDeepLink(appUrl);
-  $("open-in-phantom").href = link;
-  $("open-in-phantom").target = "_blank";
-
-  // QR via Google Chart API (simple, no dependency)
-  const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(link)}`;
-  $("phantom-qr").src = qrUrl;
+    </div>`;
+  document.querySelector(".wrap").appendChild(box);
+  $("open-phantom").href = phantomOpenLink(location.href.split("#")[0]);
 }
 
-// --- network change handler ---
-networkSel.addEventListener("change", e => {
-  network = e.target.value; connection = new Connection(clusterApiUrl(network), "confirmed");
+// --- UI wiring ---
+netSel.addEventListener("change", e=>{
+  network = e.target.value;
+  connection = new Connection(clusterApiUrl(network), "confirmed");
 });
 
-// --- try to auto-detect if we're inside Phantom in-app (mobile) ---
-function isInPhantomBrowser(){
-  // Phantom sets window.phantom?.isPhantom and window.solana?.isPhantom normally.
-  // In mobile in-app browser, window.solana should also exist after opening via deep link.
-  if(window.solana && window.solana.isPhantom) return true;
-  // Some UA sniffing fallback: check navigator.userAgent for "Phantom"
+async function tryConnect(onlyIfTrusted=false){
+  provider = getProvider();
+  if (!provider) {
+    setStatus("Phantom شناسایی نشد.");
+    // موبایل؟
+    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) showMobileHelp();
+    return false;
+  }
   try {
-    const ua = navigator.userAgent || "";
-    if(/Phantom/i.test(ua)) return true;
-  } catch(e){}
-  return false;
-}
-
-// --- connect logic with graceful fallback ---
-async function connectPhantomFlow(){
-  setStatus("در حال برقراری ارتباط با کیف...");
-  try{
-    // If Phantom already injected
-    if(window.solana && window.solana.isPhantom){
-      const resp = await window.solana.connect();
-      wallet = new PublicKey(resp.publicKey.toString());
-      connectBtn.textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
-      createBtn.disabled = false;
-      setStatus("");
-      // remove phantom-open UI if exists
-      const el = $("phantom-open"); if(el) el.remove();
-      return;
-    }
-
-    // If not injected: provide deep-link + QR to open inside Phantom app
-    const currentUrl = location.href.split("#")[0]; // keep page path as app_url
-    const deep = phantomDeepLink(currentUrl);
-    showMobileOpen(currentUrl);
-    setStatus("Phantom در مرورگر شما نصب نیست؛ برای موبایل: Open in Phantom یا اسکن QR.");
-    // Also try to open deep link programmatically on mobile (some browsers allow)
-    // This may prompt user to open Phantom.
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-    if(isMobile){
-      // try to open deep link in a new tab (works on many mobiles)
-      window.open(deep, "_blank");
-    }
-  }catch(e){
-    console.error(e); setStatus("خطا در اتصال: "+(e?.message||e));
+    const resp = await provider.connect( onlyIfTrusted ? { onlyIfTrusted:true } : {} );
+    wallet = new PublicKey(resp.publicKey.toString());
+    connectBtn.textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
+    createBtn.disabled = false;
+    setStatus("");
+    const h = $("phantom-help"); if (h) h.remove();
+    return true;
+  } catch (e) {
+    setStatus(e?.message || "اتصال لغو شد");
+    return false;
   }
 }
 
-// wire connect button
-connectBtn.addEventListener("click", connectPhantomFlow);
-
-// --- auto-check on page load: if opened via Phantom deep link, window.solana may be injected ---
-window.addEventListener("load", async ()=>{
-  // quick wait a bit for injected provider
-  await new Promise(r=>setTimeout(r, 400));
-  if(window.solana && window.solana.isPhantom){
-    try{
-      const r = await window.solana.connect({onlyIfTrusted:true});
-      if(r && r.publicKey){
-        wallet = new PublicKey(r.publicKey.toString());
-        connectBtn.textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
-        createBtn.disabled = false;
-        setStatus("");
-        const el = $("phantom-open"); if(el) el.remove();
-      }
-    }catch(e){
-      // not trusted yet; leave UI as-is
-    }
-  } else {
-    // Not injected — show open-in-phantom suggestion for mobile automatically
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-    if(isMobile){
-      // show link to open in phantom
-      showMobileOpen(location.href.split("#")[0]);
-    }
+connectBtn.addEventListener("click", async ()=>{
+  // دسکتاپ: اگر provider نیست، لینک نصب بده
+  if (!getProvider() && !/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+    window.open("https://phantom.app/download", "_blank");
+    return;
   }
+  await tryConnect(false);
 });
 
-// --- create token logic (same as before) ---
+// پس از بازگشت از اپ، دوباره تلاش کند
+document.addEventListener("visibilitychange", ()=>{
+  if (document.visibilityState === "visible" && !wallet) tryConnect(true);
+});
+
+// در بارگذاری صفحه: اگر provider حاضر بود، بی‌صدا تست کن
+window.addEventListener("load", async ()=>{
+  await new Promise(r=>setTimeout(r, 300));
+  await tryConnect(true);
+  if (!getProvider() && /Mobi|Android|iPhone/i.test(navigator.userAgent)) showMobileHelp();
+});
+
+// --- Create token (مثل قبل) ---
 createBtn.addEventListener("click", async ()=>{
-  if(!wallet) return alert("ابتدا به Phantom وصل شوید.");
+  if (!wallet || !provider) return alert("ابتدا به Phantom وصل شوید.");
   const name = $("name").value.trim();
   const symbol = $("symbol").value.trim();
   const decimals = Math.max(0, Math.min(9, parseInt($("decimals").value||"9",10)));
-  const supplyHuman = Number($("supply").value||"0"); if(!(supplyHuman>0)) return alert("عرضه اولیه معتبر نیست.");
+  const supplyHuman = Number($("supply").value||"0");
+  if (!(supplyHuman>0)) return alert("عرضه اولیه معتبر نیست.");
+
   try{
     setStatus("ایجاد Mint…");
-    const provider = window.solana;
     const signer = {
       publicKey: wallet,
-      signTransaction: tx => provider.signTransaction(tx),
+      signTransaction: tx  => provider.signTransaction(tx),
       signAllTransactions: txs => provider.signAllTransactions(txs)
     };
     const mintPk = await createMint(connection, signer, wallet, wallet, decimals, undefined, undefined, TOKEN_PROGRAM_ID);
 
-    setStatus("ساخت حساب توکن (ATA)...");
+    setStatus("ساخت ATA…");
     const ata = await getOrCreateAssociatedTokenAccount(connection, signer, mintPk, wallet);
 
     setStatus("مینت عرضه اولیه…");
@@ -170,14 +123,10 @@ createBtn.addEventListener("click", async ()=>{
     const addrUrl = `https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}`;
     resultEl.style.display = "block";
     resultEl.innerHTML = `
-      <div>نام/نماد (UI): <b>${name}</b> (${symbol})</div>
-      <div>آدرس مینت: <code>${mintPk.toBase58()}</code></div>
-      <div><a target="_blank" href="${addrUrl}">مشاهده Mint در Explorer</a> •
-          <a target="_blank" href="${txUrl}">تراکنش</a></div>`;
+      <div>Mint: <code>${mintPk.toBase58()}</code></div>
+      <div><a target="_blank" href="${addrUrl}">مشاهده Mint</a> • <a target="_blank" href="${txUrl}">تراکنش</a></div>`;
   }catch(e){
     console.error(e); setStatus("خطا"); alert(e?.message||e);
   }
 });
-
-function setStatus(t){ statusEl.textContent = t; }
-    </script>
+</script>
