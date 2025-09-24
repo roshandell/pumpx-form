@@ -1,88 +1,174 @@
-import React, {useEffect, useMemo, useState} from "react"; import { motion } from "framer-motion"; import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PumpX • ساخت توکن سولانا</title>
+  <meta name="description" content="PumpX — ساخت و لانچ توکن روی Solana با اتصال Phantom"/>
+  <link rel="preconnect" href="https://esm.sh"/>
+  <style>
+    :root{
+      --bg:#0b0f1a;--card:#0f1524;--line:#23304c;--muted:#9aa3b2;
+      --g1:linear-gradient(90deg,#12f0ff55,#7a5cff44,#ff3ef644);
+    }
+    *{box-sizing:border-box}html,body{margin:0;height:100%}
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans Arabic",sans-serif;
+      background:radial-gradient(1200px 600px at 10% -10%,#7a5cff22,transparent),
+                 radial-gradient(800px 500px at 110% 20%,#ff3ef622,transparent),
+                 var(--bg);color:#fff}
+    .wrap{max-width:1100px;margin:auto;padding:24px}
+    .nav{position:sticky;top:0;z-index:40;backdrop-filter:blur(8px);
+      background:#0b0f1acc;border-bottom:1px solid #ffffff18}
+    .navin{display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:10px;cursor:default}
+    .mark{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;
+      border:1px solid #ffffff22;background:var(--g1);font-weight:900}
+    .btn{background:var(--g1);border:1px solid #ffffff22;color:#fff;cursor:pointer;
+      padding:10px 14px;border-radius:12px}
+    .btn:hover{filter:brightness(1.1)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .hero{display:grid;gap:18px;margin:28px 0 18px}
+    .title{font-weight:900;font-size:clamp(32px,4vw,54px);line-height:1.15}
+    .subtitle{color:#cfe1ff;opacity:.85;max-width:720px}
+    .card{background:#0f1524cc;border:1px solid #ffffff22;border-radius:20px;padding:18px;box-shadow:0 10px 40px #0006}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    @media(max-width:700px){.grid{grid-template-columns:1fr}}
+    label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:#cfd6e4}
+    input,select{background:#121a2c;color:#fff;border:1px solid var(--line);
+      border-radius:12px;padding:10px 12px;font-size:14px}
+    .status{font-size:13px;opacity:.8}
+    .result{margin-top:14px;padding:12px;border-radius:14px;border:1px dashed #ffffff22;background:#0005;word-break:break-all}
+    .footer{opacity:.75;font-size:12px;margin-top:10px}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid #ffffff22;background:#ffffff10;font-size:12px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <div class="nav">
+    <div class="wrap navin">
+      <div class="logo">
+        <div class="mark">P</div>
+        <div style="font-weight:900;letter-spacing:.12em">PumpX</div>
+      </div>
+      <div class="row">
+        <select id="network">
+          <option value="devnet" selected>Devnet</option>
+          <option value="mainnet-beta">Mainnet</option>
+        </select>
+        <button id="connect" class="btn">اتصال به Phantom</button>
+      </div>
+    </div>
+  </div>
 
-/**
+  <div class="wrap">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="title">ساخت و لانچ توکن روی Solana — سریع، زیبا، حرفه‌ای</div>
+      <div class="subtitle">این نسخهٔ بدون بیلد برای GitHub Pages طراحی شده: اتصال Phantom، ساخت
+        SPL Token روی Devnet و نمایش لینک اکسپلورر. نسخهٔ کامل (Metadata/IPFS/Presale) در گام بعد.</div>
+      <div class="row">
+        <div class="pill">UI شیشه‌ای/نئونی</div>
+        <div class="pill">Phantom Ready</div>
+        <div class="pill">Devnet First</div>
+      </div>
+    </section>
 
-PumpX – Ultra-polished single‑file React app (canvas preview friendly)
+    <!-- CREATE TOKEN -->
+    <section class="card">
+      <h2 style="margin:0 0 10px;font-size:18px">فرم ساخت توکن</h2>
+      <div class="grid">
+        <label>نام (UI)
+          <input id="name" value="PumpX Token"/>
+        </label>
+        <label>نماد (Symbol)
+          <input id="symbol" value="PXP"/>
+        </label>
+        <label>Decimals
+          <input id="decimals" type="number" min="0" max="9" value="9"/>
+        </label>
+        <label>عرضه اولیه (به واحد انسانی)
+          <input id="supply" type="number" value="1000000"/>
+        </label>
+      </div>
 
+      <div class="row" style="margin-top:12px">
+        <button id="create" class="btn" disabled>ساخت توکن</button>
+        <span id="status" class="status"></span>
+      </div>
 
----
+      <div id="result" class="result" style="display:none"></div>
+      <div class="footer">نکته: این نسخهٔ MVP متادیتای روی‌چین را ثبت نمی‌کند. نسخهٔ بعدی با
+        <b>Token Metadata Program</b> (نام/نماد/آیکون روی IPFS/Arweave) عرضه می‌شود.</div>
+    </section>
+  </div>
 
-Modern glass / neon UI (dark) with Tailwind classes
+  <!-- APP (No build. ESM imports) -->
+  <script type="module">
+    import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
+    import { createMint, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID }
+      from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
 
+    const $ = id => document.getElementById(id);
+    const statusEl = $("status"), resultEl = $("result"), connectBtn = $("connect");
+    const networkSel = $("network"), createBtn = $("create");
+    let wallet = null, network = "devnet", connection = new Connection(clusterApiUrl(network), "confirmed");
 
-Landing (Hero) + Create Token page + Explore mock + Analytics mock
+    // network switch
+    networkSel.addEventListener("change", e=>{
+      network = e.target.value; connection = new Connection(clusterApiUrl(network), "confirmed");
+    });
 
+    // connect phantom
+    connectBtn.addEventListener("click", async ()=>{
+      try{
+        if(!window.solana || !window.solana.isPhantom){ alert("Phantom نصب نیست"); return; }
+        const resp = await window.solana.connect();
+        wallet = new PublicKey(resp.publicKey.toString());
+        connectBtn.textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
+        createBtn.disabled = false;
+      }catch(e){ console.error(e); alert("اتصال ناموفق بود"); }
+    });
 
-Phantom connect (window.solana) and devnet token creation (simple SPL)
+    // create token
+    createBtn.addEventListener("click", async ()=>{
+      if(!wallet) return alert("ابتدا به Phantom وصل شوید.");
+      const name = $("name").value.trim();
+      const symbol = $("symbol").value.trim();
+      const decimals = Math.max(0, Math.min(9, parseInt($("decimals").value||"9",10)));
+      const supplyHuman = Number($("supply").value||"0"); if(!(supplyHuman>0)) return alert("عرضه اولیه معتبر نیست.");
+      try{
+        setStatus("ایجاد Mint…");
+        const provider = window.solana;
+        const signer = {
+          publicKey: wallet,
+          signTransaction: tx => provider.signTransaction(tx),
+          signAllTransactions: txs => provider.signAllTransactions(txs)
+        };
+        const mintPk = await createMint(connection, signer, wallet, wallet, decimals, undefined, undefined, TOKEN_PROGRAM_ID);
 
+        setStatus("ساخت حساب توکن (ATA)...");
+        const ata = await getOrCreateAssociatedTokenAccount(connection, signer, mintPk, wallet);
 
-No build tools required in this canvas; copy into a Vite/Next project later
+        setStatus("مینت عرضه اولیه…");
+        const amount = Math.round(supplyHuman * 10**decimals);
+        const sig = await mintTo(connection, signer, mintPk, ata.address, wallet, amount);
 
+        setStatus("انجام شد ✅");
+        const txUrl = `https://explorer.solana.com/tx/${sig}?cluster=${network==="devnet"?"devnet":""}`;
+        const addrUrl = `https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}`;
+        resultEl.style.display = "block";
+        resultEl.innerHTML = `
+          <div>نام/نماد (UI): <b>${name}</b> (${symbol})</div>
+          <div>آدرس مینت: <code>${mintPk.toBase58()}</code></div>
+          <div><a target="_blank" href="${addrUrl}">مشاهده Mint در Explorer</a> •
+              <a target="_blank" href="${txUrl}">تراکنش</a></div>`;
+      }catch(e){
+        console.error(e); setStatus("خطا"); alert(e?.message||e);
+      }
+    });
 
-NOTE: For a production repo (GitHub Pages / Next.js), place this component as the root,
-
-add Tailwind, and move blockchain helpers into /lib. I’ll share setup steps in chat. */
-
-
-// ---- Minimal ESM dynamic loaders for Solana libs (avoids bundler here) ---- // We import lazily when needed to keep canvas preview snappy. async function loadWeb3() { const web3 = await import("https://esm.sh/@solana/web3.js@1.95.3"); return web3; } async function loadSplToken() { const spl = await import("https://esm.sh/@solana/spl-token@0.4.6?bundle"); return spl; }
-
-const neon = "bg-gradient-to-r from-cyan-400/30 via-violet-500/25 to-fuchsia-500/30";
-
-const sampleChart = Array.from({length: 24}).map((_,i)=>({ t: ${i}:00, v: Math.round(50 + 30*Math.sin(i/3) + (Math.random()*10)) }));
-
-function Section({title, subtitle, children}:{title:string; subtitle?:string; children:React.ReactNode}){ return ( <div className="w-full max-w-7xl mx-auto px-4 md:px-8"> <div className="mb-6"> <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">{title}</h2> {subtitle && <p className="text-sm md:text-base text-slate-300/80 mt-1 max-w-3xl">{subtitle}</p>} </div> {children} </div> ); }
-
-function Navbar({onNav, current, onConnect, address}:{onNav:(k:string)=>void; current:string; onConnect:()=>void; address?:string}){ return ( <div className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-slate-900/60 border-b border-white/10"> <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between"> <div onClick={()=>onNav("home")} className="cursor-pointer select-none flex items-center gap-3"> <div className={w-9 h-9 rounded-xl ${neon} grid place-items-center border border-white/10}>P</div> <div className="font-black tracking-wider">PumpX</div> </div> <div className="hidden md:flex items-center gap-1 text-sm"> {[ ["home","صفحه اصلی"], ["create","ساخت توکن"], ["explore","اکسپلور"], ["analytics","آنالیتیکس"], ].map(([k, label])=> ( <button key={k} onClick={()=>onNav(k)} className={px-3 py-2 rounded-lg hover:bg-white/5 ${current===k?"bg-white/10": ""}}>{label}</button> ))} </div> <div className="flex items-center gap-2"> <button onClick={onConnect} className={px-3 py-2 rounded-xl border border-white/10 ${neon} hover:brightness-110 text-sm}> {address? متصل: ${address.slice(0,4)}…${address.slice(-4)}: "اتصال Phantom"} </button> </div> </div> </div> ); }
-
-function Hero(){ return ( <div className="relative overflow-hidden"> <div className="absolute inset-0 -z-10 opacity-30 bg-[radial-gradient(ellipse_at_top,rgba(56,189,248,0.25),transparent_60%)]"/> <div className="absolute -top-40 -right-40 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-30 bg-fuchsia-500/40"/> <div className="max-w-7xl mx-auto px-4 md:px-8 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center"> <motion.div initial={{y:20,opacity:0}} animate={{y:0,opacity:1}} transition={{duration:.6}}> <h1 className="text-4xl md:text-6xl font-black leading-tight"> ساخت و لانچ توکن روی <span className="text-cyan-300">Solana</span>— در کلاس <span className="text-fuchsia-300">جهانی</span> </h1> <p className="mt-4 text-slate-300/90 text-lg max-w-xl"> PumpX تمام مسیر ایجاد، متادیتا، پری‌سیل، قفل نقدینگی و تحلیل لحظه‌ای را در یک تجربه‌ی فوق‌ساده و هوشمند جمع کرده است. </p> <div className="mt-6 flex gap-3"> <a href="#create" className={px-5 py-3 rounded-2xl ${neon} border border-white/10}>شروع ساخت توکن</a> <a href="#features" className="px-5 py-3 rounded-2xl bg-white/5 border border-white/10">ویژگی‌ها</a> </div> </motion.div> <motion.div initial={{scale:.95,opacity:0}} animate={{scale:1,opacity:1}} transition={{duration:.6, delay:.1}}> <div className="rounded-3xl border border-white/10 p-4 bg-slate-900/40"> <div className="text-sm text-slate-300/80 mb-2">حجم/قیمت نمونه</div> <div className="h-60"> <ResponsiveContainer width="100%" height="100%"> <AreaChart data={sampleChart}> <defs> <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"> <stop offset="0%" stopColor="#67e8f9" stopOpacity={0.6}/> <stop offset="100%" stopColor="#f0abfc" stopOpacity={0.2}/> </linearGradient> </defs> <XAxis dataKey="t" hide/> <YAxis hide/> <Tooltip contentStyle={{background:"#0b0f1a", border:"1px solid #23304c", borderRadius:12}}/> <Area type="monotone" dataKey="v" stroke="#a78bfa" fill="url(#g1)" strokeWidth={2} /> </AreaChart> </ResponsiveContainer> </div> </div> </motion.div> </div> </div> ); }
-
-function FeatureGrid(){ const feats = [ {t:"ساخت توکن هوشمند", d:"Token-2022 + Metadata روی‌چین با ثبت نام/نماد/آیکون (IPFS/Arweave)."}, {t:"پری‌سیل و باندینگ‌کرو", d:"مدل‌های انعطاف‌پذیر لانچ؛ خزانه، قفل تیم، آنتی‌بات."}, {t:"آنالیتیکس لحظه‌ای", d:"قیمت/حجم، توزیع هولدر، ورود از سوشال و هشدارها."}, {t:"دیوار دفاعی تقلب", d:"کشف رفتار مشکوک و محافظت از لانچ با هوش مصنوعی."}, ]; return ( <Section title="ویژگی‌های کلیدی" subtitle="فراتر از pump.fun — همه‌چیز آماده رشد برند جهانی."> <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4"> {feats.map((f,i)=> ( <div key={i} className={p-4 rounded-2xl border border-white/10 bg-slate-900/40 ${neon}}> <div className="font-bold mb-1">{f.t}</div> <div className="text-slate-300/90 text-sm leading-6">{f.d}</div> </div> ))} </div> </Section> ); }
-
-function Explore(){ const rows = new Array(8).fill(0).map((_,i)=>({ name: Nova ${i+1}, symbol:"NVA", mc: (2.1+i0.3).toFixed(2)+"M", liq: (120+i15)+"k", change: (Math.random()*20-10).toFixed(2) })); return ( <Section title="اکسپلور" subtitle="نمونه‌ی فهرست توکن‌ها؛ نسخه‌ی زنده به ایندکسر زنجیره متصل می‌شود."> <div className="overflow-x-auto rounded-2xl border border-white/10"> <table className="min-w-full text-sm"> <thead className="bg-white/5"> <tr> <th className="text-left p-3">توکن</th> <th className="text-left p-3">نماد</th> <th className="text-left p-3">مارکت‌کپ</th> <th className="text-left p-3">نقدینگی</th> <th className="text-left p-3">24h%</th> </tr> </thead> <tbody> {rows.map((r,i)=> ( <tr key={i} className="border-t border-white/5 hover:bg-white/5"> <td className="p-3">{r.name}</td> <td className="p-3">{r.symbol}</td> <td className="p-3">{r.mc}</td> <td className="p-3">{r.liq}</td> <td className={p-3 ${Number(r.change)>=0?"text-emerald-400":"text-rose-400"}}>{r.change}%</td> </tr> ))} </tbody> </table> </div> </Section> ); }
-
-function Analytics(){ return ( <Section title="آنالیتیکس" subtitle="نمودار نمونه؛ نسخه‌ی کامل به ایندکسر و websocket وصل می‌شود."> <div className="grid md:grid-cols-2 gap-4"> <div className="p-4 rounded-2xl border border-white/10 bg-slate-900/40"> <div className="text-sm mb-2">حجم/قیمت</div> <div className="h-64"> <ResponsiveContainer width="100%" height="100%"> <AreaChart data={sampleChart}> <Area type="monotone" dataKey="v" stroke="#67e8f9" fill="#0ea5e955" strokeWidth={2} /> </AreaChart> </ResponsiveContainer> </div> </div> <div className="p-4 rounded-2xl border border-white/10 bg-slate-900/40"> <div className="text-sm mb-2">هشدارها (نمونه)</div> <ul className="text-slate-300/90 text-sm leading-7 list-disc ps-6"> <li>🚀 عبور نقدینگی از 250k</li> <li>📈 حجم 1h ×2 نسبت به میانگین</li> <li>🛡️ تشخیص کلاستر ربات – محدودسازی موقت</li> </ul> </div> </div> </Section> ); }
-
-function CreateToken({address}:{address?:string}){ const [network,setNetwork]=useState("devnet"); const [name,setName]=useState("PumpX Token"); const [symbol,setSymbol]=useState("PXP"); const [decimals,setDecimals]=useState(9); const [supply,setSupply]=useState("1000000"); const [status,setStatus]=useState(""); const [mint,setMint]=useState<string|null>(null); const [tx,setTx]=useState<string|null>(null);
-
-async function onCreate(){ try{ setStatus("در حال بارگذاری کتابخانه‌ها..."); const web3 = await loadWeb3(); const spl = await loadSplToken();
-
-if(!window.solana || !window.solana.isPhantom) throw new Error("Phantom نصب نیست");
-  const connection = new web3.Connection(web3.clusterApiUrl(network), "confirmed");
-  const wallet = new web3.PublicKey(address!);
-  const provider = window.solana;
-  const signer = {
-    publicKey: wallet,
-    signTransaction: (tx: any) => provider.signTransaction(tx),
-    signAllTransactions: (txs: any) => provider.signAllTransactions(txs)
-  };
-
-  setStatus("ایجاد Mint جدید...");
-  const mintPk = await spl.createMint(connection, signer as any, wallet, wallet, Number(decimals));
-
-  setStatus("ساخت حساب توکن کاربر...");
-  const ata = await spl.getOrCreateAssociatedTokenAccount(connection, signer as any, mintPk, wallet);
-
-  setStatus("مینت عرضه اولیه...");
-  const amount = Math.round(Number(supply) * 10**Number(decimals));
-  const sig = await spl.mintTo(connection, signer as any, mintPk, ata.address, wallet, amount);
-
-  setMint(mintPk.toBase58());
-  setTx(`https://explorer.solana.com/tx/${sig}?cluster=${network==="devnet"?"devnet":""}`);
-  setStatus("انجام شد ✅");
-}catch(e:any){
-  console.error(e); setStatus("خطا: "+(e?.message||e));
-}
-
-}
-
-return ( <Section title="ساخت توکن" subtitle="اتصال Phantom لازم است. این نسخه، متادیتای روی‌چین را هنوز نمی‌نویسد (MVP)."> <div id="create" className="grid md:grid-cols-2 gap-4"> <label className="flex flex-col gap-2">نام (UI) <input value={name} onChange={e=>setName(e.target.value)} className="bg-[#121a2c] border border-white/10 rounded-xl px-3 py-2"/> </label> <label className="flex flex-col gap-2">نماد <input value={symbol} onChange={e=>setSymbol(e.target.value)} className="bg-[#121a2c] border border-white/10 rounded-xl px-3 py-2"/> </label> <label className="flex flex-col gap-2">Decimals <input type="number" min={0} max={9} value={decimals} onChange={e=>setDecimals(parseInt(e.target.value))} className="bg-[#121a2c] border border-white/10 rounded-xl px-3 py-2"/> </label> <label className="flex flex-col gap-2">عرضه اولیه (به واحد انسانی) <input type="number" value={supply} onChange={e=>setSupply(e.target.value)} className="bg-[#121a2c] border border-white/10 rounded-xl px-3 py-2"/> </label> </div> <div className="flex items-center gap-3 mt-4"> <select value={network} onChange={e=>setNetwork(e.target.value)} className="bg-[#121a2c] border border-white/10 rounded-xl px-3 py-2"> <option value="devnet">Devnet</option> <option value="mainnet-beta">Mainnet (با احتیاط)</option> </select> <button disabled={!address} onClick={onCreate} className={px-5 py-2 rounded-2xl border border-white/10 ${neon} disabled:opacity-50}> ساخت توکن </button> <span className="text-sm opacity-80">{status}</span> </div> {mint && ( <div className="mt-4 p-4 rounded-2xl border border-white/10 bg-slate-900/40 text-sm"> آدرس مینت: <span className="break-all">{mint}</span><br/> <a className="underline" href={https://explorer.solana.com/address/${mint}?cluster=${network==="devnet"?"devnet":""}} target="_blank">مشاهده در Explorer</a> {tx && <> • <a className="underline" href={tx} target="_blank">تراکنش</a></>} </div> )} </Section> ); }
-
-export default function App(){ const [page,setPage]=useState("home"); const [address,setAddress]=useState<string|undefined>(undefined);
-
-async function connectPhantom(){ try{ if(!window.solana || !window.solana.isPhantom){ alert("Phantom نصب نیست"); return; } const r = await window.solana.connect(); setAddress(r.publicKey.toString()); }catch(e){ console.error(e); } }
-
-useEffect(()=>{ const hash = window.location.hash.replace("#",""); if(hash) setPage(hash); },[]); useEffect(()=>{ window.location.hash = page; },[page]);
-
-return ( <div className="min-h-screen bg-[#0b0f1a] text-white"> <Navbar onNav={setPage} current={page} onConnect={connectPhantom} address={address}/> <Hero/> <div id="features" className="py-10"><FeatureGrid/></div> <div className="py-10" id="create">{page!=="create"? null: <CreateToken address={address}/>}</div> {page==="explore" && <div className="py-10"><Explore/></div>} {page==="analytics" && <div className="py-10"><Analytics/></div>} <footer className="py-12 border-t border-white/10 mt-10"> <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between gap-4 text-sm text-slate-300/80"> <div>© {new Date().getFullYear()} PumpX — Create • Launch • Grow</div> <div className="flex gap-3"> <a className="hover:underline" href="#create">ساخت توکن</a> <a className="hover:underline" href="#explore">اکسپلور</a> <a className="hover:underline" href="#analytics">آنالیتیکس</a> </div> </div> </footer> </div> ); }
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+    function setStatus(t){ statusEl.textContent = t; }
+  </script>
+</body>
+</html>
