@@ -1,209 +1,167 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>PumpX • Token Creator + Wallet Diagnostics</title>
-  <link rel="preconnect" href="https://esm.sh"/>
-  <style>
-    :root{--bg:#0b0f1a;--card:#0f1524;--line:#23304c}
-    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,"Noto Sans Arabic",sans-serif;background:var(--bg);color:#fff}
-    a{color:#79d9ff}
-    .wrap{max-width:1100px;margin:auto;padding:22px}
-    .nav{position:sticky;top:0;z-index:40;background:#0b0f1acc;border-bottom:1px solid #ffffff18;backdrop-filter:blur(10px)}
-    .navin{display:flex;justify-content:space-between;align-items:center;height:64px}
-    .btn{background:linear-gradient(90deg,#12f0ff44,#7a5cff33,#ff3ef633);border:1px solid #ffffff22;padding:10px 14px;border-radius:12px;color:#fff;cursor:pointer}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
-    .select,.input{background:#121a2c;border:1px solid var(--line);color:#fff;border-radius:12px;padding:10px 12px}
-    .card{background:#0f1524cc;border:1px solid #ffffff22;border-radius:18px;padding:16px;box-shadow:0 10px 40px #0006;margin-top:16px}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    @media(max-width:760px){.grid{grid-template-columns:1fr}}
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .muted{opacity:.8;font-size:13px}
-    .code{background:#0b0f1a;border:1px solid #ffffff22;border-radius:10px;padding:8px 10px;word-break:break-all}
-  </style>
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Solana Wallet Test – Phantom & Solflare</title>
+<link rel="preconnect" href="https://esm.sh"/>
+<style>
+  body{margin:0;background:#0b0f1a;color:#fff;font-family:Inter,system-ui,"Noto Sans Arabic",sans-serif}
+  .wrap{max-width:720px;margin:auto;padding:24px}
+  .card{background:#0f1524;border:1px solid #ffffff22;border-radius:16px;padding:16px;margin:12px 0}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button{background:#1b2744;border:1px solid #334466;color:#fff;border-radius:10px;padding:10px 12px;cursor:pointer}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  select,input{background:#121a2c;border:1px solid #334466;color:#fff;border-radius:10px;padding:8px 10px}
+  .code{background:#0b0f1a;border:1px solid #334466;border-radius:10px;padding:8px 10px;word-break:break-all}
+  .muted{opacity:.8;font-size:13px}
+</style>
 </head>
 <body>
-<!-- NAV -->
-<div class="nav"><div class="wrap navin">
-  <div style="font-weight:900;letter-spacing:.12em">PumpX • Token Creator</div>
-  <div class="row">
-    <select id="network" class="select">
-      <option value="devnet" selected>Devnet</option>
-      <option value="mainnet-beta">Mainnet</option>
-    </select>
-    <button id="connect" class="btn">اتصال Phantom</button>
-    <button id="disconnect" class="btn" style="display:none">قطع اتصال</button>
-  </div>
-</div></div>
-
 <div class="wrap">
-  <!-- DIAGNOSTICS -->
-  <section class="card">
-    <h2 style="margin:0 0 10px">وضعیت کیف‌پول / شبکه</h2>
-    <div class="grid">
-      <div>
-        <div class="muted">Provider:</div>
-        <div id="prov" class="code">در حال تشخیص…</div>
-      </div>
-      <div>
-        <div class="muted">HTTPS:</div>
-        <div id="httpsOk" class="code">—</div>
-      </div>
-      <div>
-        <div class="muted">آدرس کیف:</div>
-        <div id="addr" class="code">—</div>
-      </div>
-      <div>
-        <div class="muted">موجودی (SOL):</div>
-        <div id="bal" class="code">—</div>
-      </div>
+  <h1>تست کیف پول سولانا — Phantom / Solflare</h1>
+  <div class="card">
+    <div class="row">
+      <label>شبکه:
+        <select id="network">
+          <option value="devnet" selected>Devnet</option>
+          <option value="mainnet-beta">Mainnet</option>
+        </select>
+      </label>
+      <span class="muted">لطفاً صفحه را با <b>HTTPS</b> باز کنید. موبایل: داخل اپ Phantom/Solflare باز شود.</span>
     </div>
-    <div class="muted" style="margin-top:8px">
-      اگر دسکتاپ هستی: افزونه Phantom باید نصب و Unlock باشد. اگر موبایل هستی باید صفحه را داخل اپ Phantom باز کنی.
-    </div>
-  </section>
+  </div>
 
-  <!-- TOKEN FORM -->
-  <section class="card">
-    <h2 style="margin:0 0 10px">فرم ساخت توکن</h2>
-    <div class="grid">
-      <label>نام (UI) <input id="name" class="input" value="PumpX Token"/></label>
-      <label>نماد <input id="symbol" class="input" value="PXP"/></label>
-      <label>Decimals <input id="decimals" class="input" type="number" min="0" max="9" value="9"/></label>
-      <label>عرضه اولیه (به واحد انسانی) <input id="supply" class="input" type="number" value="1000000"/></label>
-    </div>
-    <div class="row" style="margin-top:12px">
-      <button class="btn" id="create" disabled>ساخت توکن</button>
+  <div class="card">
+    <h3>اتصال</h3>
+    <div class="row">
+      <button id="connect-phantom">اتصال Phantom</button>
+      <button id="connect-solflare">اتصال Solflare</button>
+      <button id="disconnect" disabled>قطع اتصال</button>
       <span id="status" class="muted"></span>
     </div>
-    <div id="out" class="card" style="display:none;margin-top:12px"></div>
-    <div class="muted" style="margin-top:8px">Devnet را در Phantom انتخاب کن و از فاست کمی SOL بگیر.</div>
-  </section>
+  </div>
+
+  <div class="card">
+    <h3>وضعیت</h3>
+    <div class="row"><span class="muted">Provider:</span> <span id="prov" class="code">—</span></div>
+    <div class="row"><span class="muted">آدرس:</span> <span id="addr" class="code">—</span></div>
+    <div class="row"><span class="muted">موجودی SOL:</span> <span id="bal" class="code">—</span></div>
+  </div>
+
+  <div class="card">
+    <h3>نکات سریع</h3>
+    <ul class="muted">
+      <li>Phantom دسکتاپ: افزونه نصب و Unlock باشد. Solflare دسکتاپ: افزونه Solflare نصب و Unlock.</li>
+      <li>موبایل: همین آدرس را داخل اپ **Phantom** یا **Solflare** (مرورگر داخلی) باز کن.</li>
+      <li>Devnet: از فاست Devnet کمی SOL بگیر تا موجودی صفر نباشد.</li>
+    </ul>
+  </div>
 </div>
 
 <script type="module">
 import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
-import { createMint, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID } from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
 
 const $ = id => document.getElementById(id);
-const statusEl = $("status"), outEl = $("out");
-const connectBtn = $("connect"), disconnectBtn = $("disconnect"), createBtn = $("create");
-const netSel = $("network"), provEl=$("prov"), httpsEl=$("httpsOk"), addrEl=$("addr"), balEl=$("bal");
+const netSel = $("network");
+const btnPhantom = $("connect-phantom");
+const btnSolflare = $("connect-solflare");
+const btnDisconnect = $("disconnect");
+const statusEl = $("status");
+const provEl = $("prov");
+const addrEl = $("addr");
+const balEl = $("bal");
 
-let provider = null, wallet = null, network = "devnet";
+let provider = null;
+let walletPubkey = null;
+let network = "devnet";
 let connection = new Connection(clusterApiUrl(network), "confirmed");
 
+// -------- Helpers --------
 function setStatus(t){ statusEl.textContent = t || ""; }
-function getProvider(){
+function short(pk){ return pk ? pk.slice(0,4) + "…" + pk.slice(-4) : "—"; }
+function getPhantomProvider(){
   const w = window;
-  // جدید
   if (w?.phantom?.solana?.isPhantom) return w.phantom.solana;
-  // قدیمی
   if (w?.solana?.isPhantom) return w.solana;
   return null;
 }
-function short(pk){ return pk ? pk.slice(0,4)+"…"+pk.slice(-4) : "—"; }
-
+function getSolflareProvider(){
+  const w = window;
+  if (w?.solflare) return w.solflare; // رسمی
+  if (w?.solana?.isSolflare) return w.solana; // برخی نسخه‌ها
+  return null;
+}
 async function refreshBalance(){
+  if(!walletPubkey){ balEl.textContent="—"; return; }
   try{
-    if(!wallet) { balEl.textContent = "—"; return; }
-    const lamports = await connection.getBalance(new PublicKey(wallet));
-    balEl.textContent = (lamports/1e9).toFixed(4);
-  }catch{ balEl.textContent = "خطا" }
+    const lamports = await connection.getBalance(new PublicKey(walletPubkey));
+    balEl.textContent = (lamports/1e9).toFixed(6);
+  }catch(e){ balEl.textContent = "خطا"; }
+}
+function showProviderName(p){
+  if(!p){ provEl.textContent = "پیدا نشد ❌"; return; }
+  if (p === getPhantomProvider()) provEl.textContent = "Phantom ✅";
+  else if (p === getSolflareProvider()) provEl.textContent = "Solflare ✅";
+  else provEl.textContent = "نامشخص/سازگار ✅";
 }
 
-async function connect(onlyIfTrusted=false){
-  provider = getProvider();
-  provEl.textContent = provider ? (provider === window?.phantom?.solana ? "window.phantom.solana ✅" : "window.solana ✅") : "پیدا نشد ❌";
-  if(!provider){
-    if(!location.protocol.startsWith("https")) setStatus("صفحه باید با HTTPS باز شود.");
-    return false;
+// -------- Network change --------
+netSel.addEventListener("change", e=>{
+  network = e.target.value;
+  connection = new Connection(clusterApiUrl(network), "confirmed");
+  refreshBalance();
+});
+
+// -------- Connect / Disconnect --------
+async function connectWith(p){
+  if(!p){
+    setStatus("Provider یافت نشد. نصب/بازکردن کیف پول را بررسی کن.");
+    return;
   }
+  provider = p;
+  showProviderName(provider);
   try{
-    const resp = await provider.connect( onlyIfTrusted ? {onlyIfTrusted:true} : {} );
-    wallet = resp.publicKey.toString();
-    connectBtn.textContent = "متصل: " + short(wallet);
-    connectBtn.style.display = "none";
-    disconnectBtn.style.display = "inline-block";
-    createBtn.disabled = false;
-    addrEl.textContent = wallet;
+    // برخی کیف‌ها از onlyIfTrusted پشتیبانی می‌کنند
+    const resp = await provider.connect ? provider.connect() : provider.request({method:"connect"});
+    const pk = resp?.publicKey?.toString?.() || provider.publicKey?.toString?.();
+    if(!pk) throw new Error("PublicKey برنگشت.");
+    walletPubkey = pk;
+    addrEl.textContent = pk;
+    setStatus("متصل شد: " + short(pk));
+    btnDisconnect.disabled = false;
     await refreshBalance();
-    setStatus("");
-    return true;
   }catch(e){
-    setStatus(e?.message || "اتصال لغو شد");
-    return false;
+    console.error(e);
+    setStatus("خطا/لغو اتصال: " + (e?.message || e));
   }
 }
 
 async function disconnect(){
-  try{ await provider?.disconnect?.(); }catch{}
-  wallet = null;
-  connectBtn.textContent = "اتصال Phantom";
-  connectBtn.style.display = "inline-block";
-  disconnectBtn.style.display = "none";
-  createBtn.disabled = true;
+  try{
+    await provider?.disconnect?.();
+  }catch(e){}
+  walletPubkey = null;
   addrEl.textContent = "—";
   balEl.textContent = "—";
   setStatus("قطع شد");
+  btnDisconnect.disabled = true;
 }
 
-netSel.addEventListener("change", async e=>{
-  network = e.target.value;
-  connection = new Connection(clusterApiUrl(network), "confirmed");
-  await refreshBalance();
-});
+// Buttons
+btnPhantom.addEventListener("click", ()=> connectWith(getPhantomProvider()));
+btnSolflare.addEventListener("click", ()=> connectWith(getSolflareProvider()));
+btnDisconnect.addEventListener("click", disconnect);
 
-connectBtn.addEventListener("click", ()=>connect(false));
-disconnectBtn.addEventListener("click", disconnect);
-
-// تلاش خودکار روی لود
-window.addEventListener("load", async ()=>{
-  httpsEl.textContent = location.protocol.startsWith("https") ? "بله ✅" : "خیر ❌ (GitHub Pages با HTTPS باز کن)";
-  await new Promise(r=>setTimeout(r, 300));
-  await connect(true); // اگر اعتماد قبلی هست بی‌صدا وصل شود
-  if(!wallet) setStatus("برای اتصال کلیک کن. اگر دسکتاپی، افزونه باید نصب/Unlock باشد.");
-});
-
-// ساخت توکن
-createBtn.addEventListener("click", async ()=>{
-  if (!wallet || !provider) return alert("ابتدا به Phantom وصل شوید.");
-  const name = $("name").value.trim();
-  const symbol = $("symbol").value.trim();
-  const decimals = Math.max(0, Math.min(9, parseInt($("decimals").value||"9",10)));
-  const supplyHuman = Number($("supply").value||"0");
-  if (!(supplyHuman>0)) return alert("عرضه اولیه معتبر نیست.");
-
-  try{
-    setStatus("ایجاد Mint…");
-    const signer = {
-      publicKey: new PublicKey(wallet),
-      signTransaction: tx  => provider.signTransaction(tx),
-      signAllTransactions: txs => provider.signAllTransactions(txs)
-    };
-    const mintPk = await createMint(connection, signer, new PublicKey(wallet), new PublicKey(wallet), decimals, undefined, undefined, TOKEN_PROGRAM_ID);
-
-    setStatus("ساخت ATA…");
-    const ata = await getOrCreateAssociatedTokenAccount(connection, signer, mintPk, new PublicKey(wallet));
-
-    setStatus("مینت عرضه اولیه…");
-    const amount = Math.round(supplyHuman * 10**decimals);
-    const sig = await mintTo(connection, signer, mintPk, ata.address, new PublicKey(wallet), amount);
-
-    await refreshBalance();
-    setStatus("انجام شد ✅");
-    const txUrl = `https://explorer.solana.com/tx/${sig}?cluster=${network==="devnet"?"devnet":""}`;
-    const addrUrl = `https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}`;
-    outEl.style.display = "block";
-    outEl.innerHTML = `
-      <div>نام/نماد (UI): <b>${name}</b> (${symbol})</div>
-      <div>Mint: <div class="code">${mintPk.toBase58()}</div></div>
-      <div><a target="_blank" href="${addrUrl}">مشاهده Mint</a> • <a target="_blank" href="${txUrl}">تراکنش</a></div>`;
-  }catch(e){
-    console.error(e);
-    setStatus("خطا: "+(e?.message||e));
-  }
+// Auto-detect (debug info)
+window.addEventListener("load", ()=>{
+  const p1 = !!getPhantomProvider();
+  const p2 = !!getSolflareProvider();
+  provEl.textContent = (p1? "Phantom✅ " : "Phantom❌ ") + "| " + (p2? "Solflare✅" : "Solflare❌");
+  if(!location.protocol.startsWith("https")) setStatus("⚠️ صفحه باید با HTTPS باشد (GitHub Pages → Enforce HTTPS).");
 });
 </script>
 </body>
