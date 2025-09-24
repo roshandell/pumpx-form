@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Solana Wallet Test – Phantom & Solflare (Final)</title>
+<title>Solana Wallet Test – Phantom & Solflare (Final+Debug)</title>
 <link rel="preconnect" href="https://esm.sh"/>
 <style>
   :root{--bg:#0b0f1a;--card:#0f1524;--line:#334466}
@@ -22,7 +22,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1 style="margin:6px 0">تست کیف پول سولانا — Phantom / Solflare (Final)</h1>
+  <h1 style="margin:6px 0">تست کیف پول سولانا — Phantom / Solflare</h1>
 
   <!-- شبکه + RPC -->
   <div class="card">
@@ -39,8 +39,7 @@
       <span id="https" class="muted">HTTPS: —</span>
     </div>
     <div class="muted" style="margin-top:6px">
-      برای Mainnet حتماً یک RPC اختصاصی (Helius/Alchemy/QuickNode/…)
-      وارد کن تا خطای rate limit نگیری.
+      برای Mainnet حتماً یک RPC اختصاصی (Helius/Alchemy/QuickNode/…) وارد کن تا خطای rate limit نگیری.
     </div>
   </div>
 
@@ -61,9 +60,11 @@
     <div class="row"><span class="muted">Provider:</span> <span id="prov" class="code">—</span></div>
     <div class="row"><span class="muted">آدرس:</span> <span id="addr" class="code">—</span></div>
     <div class="row"><span class="muted">موجودی SOL:</span> <span id="bal" class="code">—</span></div>
+    <div class="row"><span class="muted">RPC فعال:</span> <span id="rpcUsing" class="code">—</span></div>
+    <div class="row"><span class="muted">خطای آخر:</span> <span id="lastErr" class="code">—</span></div>
     <div class="muted" style="margin-top:8px">
       Devnet: از <a href="https://faucet.solana.com" target="_blank">فاست سولانا</a> SOL بگیر.  
-      اگر موجودی «خطا» شد، شبکه کیف را با انتخاب بالا یکی کن، یا برای Mainnet یک RPC اختصاصی بده.
+      اگر موجودی «خطا» شد، شبکهٔ کیف را با انتخاب بالا یکی کن؛ برای Mainnet یک RPC اختصاصی بده.
     </div>
   </div>
 </div>
@@ -75,6 +76,7 @@ const $ = id => document.getElementById(id);
 const netSel = $("network"), rpcMain = $("rpcMain");
 const btnPhantom = $("connect-phantom"), btnSolflare = $("connect-solflare"), btnDisconnect = $("disconnect");
 const statusEl = $("status"), provEl = $("prov"), addrEl = $("addr"), balEl = $("bal");
+const rpcUsingEl = $("rpcUsing"), lastErrEl = $("lastErr");
 $("https").textContent = location.protocol.startsWith("https") ? "HTTPS: بله ✅" : "HTTPS: خیر ❌";
 
 let provider = null;
@@ -124,18 +126,40 @@ function showProviderName(p){
   else provEl.textContent = "نامشخص/سازگار ✅";
 }
 
-/* ---------- Balance با فالبک ---------- */
-async function safeGetBalance(pubkeyBase58, net){
-  const pks = new PublicKey(pubkeyBase58);
-  let lastErr=null;
-  for (const url of getRPCs(net)) {
+/* ---------- خواندن موجودی با فالبک + گزارش ---------- */
+async function tryBalanceFrom(url, pubkey){
+  const conn = new Connection(url, "confirmed");
+  rpcUsingEl.textContent = url;
+  // تست 1: getBalance
+  try {
+    const lamports = await conn.getBalance(new PublicKey(pubkey));
+    return { ok:true, lamports };
+  } catch (e1) {
+    // تست 2: getAccountInfo (برای تشخیص CORS/Rate-limit)
     try {
-      const conn = new Connection(url, "confirmed");
-      const lamports = await conn.getBalance(pks);
-      return lamports;
-    } catch(e){ lastErr = e; /* بعدی را امتحان کن */ }
+      const info = await conn.getAccountInfo(new PublicKey(pubkey));
+      if (info) return { ok:true, lamports: info.lamports ?? 0 };
+      return { ok:true, lamports: 0 }; // اکانت وجود ندارد => 0
+    } catch (e2) {
+      throw new Error(`(${url}) ${e2?.message || e2}`);
+    }
   }
-  throw lastErr || new Error("RPCs unavailable");
+}
+async function safeGetBalance(pubkeyBase58, net){
+  lastErrEl.textContent = "—";
+  const urls = getRPCs(net);
+  let lastErr = null;
+  for (const url of urls) {
+    try {
+      const res = await tryBalanceFrom(url, pubkeyBase58);
+      if (res.ok) return res.lamports;
+    } catch (e) {
+      lastErr = e;
+      lastErrEl.textContent = String(e);
+      // بعدی را امتحان کن
+    }
+  }
+  throw lastErr || new Error("هیچ RPC در دسترس نیست");
 }
 async function refreshBalance(){
   if(!walletPubkey){ balEl.textContent="—"; return; }
@@ -146,7 +170,7 @@ async function refreshBalance(){
     setStatus("");
   }catch(e){
     balEl.textContent = "خطا";
-    console.error("Balance error:", e);
+    lastErrEl.textContent = String(e);
     const msg = String(e).toLowerCase();
     setStatus(
       msg.includes("429") || msg.includes("rate")
