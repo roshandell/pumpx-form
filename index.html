@@ -1,543 +1,233 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PumpX - Advanced AI-Powered Solana Token Platform</title>
-    <style>
-        :root {
-            /* Solana Official Colors */
-            --solana-purple: #9945FF;
-            --solana-green: #14F195;
-            --solana-blue: #00C2FF;
-            --solana-dark: #0A0B1D;
-            --solana-card: #1A1B2E;
-            --solana-gray: #8F9BB3;
-            --text-light: #FFFFFF;
-            
-            /* Gradient Combinations */
-            --gradient-primary: linear-gradient(135deg, var(--solana-purple), var(--solana-blue));
-            --gradient-success: linear-gradient(135deg, var(--solana-green), var(--solana-blue));
-            --gradient-accent: linear-gradient(135deg, #FF6B6B, var(--solana-purple));
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-        
-        body {
-            background: var(--solana-dark);
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        /* Language Switch */
-        .language-switcher {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 10px 15px;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .lang-btn {
-            background: transparent;
-            color: var(--text-light);
-            border: none;
-            padding: 5px 15px;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-        
-        .lang-btn.active {
-            background: var(--solana-purple);
-            color: white;
-        }
-        
-        /* Header */
-        .hero-header {
-            text-align: center;
-            padding: 120px 0 80px;
-            background: linear-gradient(135deg, rgba(153, 69, 255, 0.1), rgba(0, 194, 255, 0.1));
-            border-radius: 30px;
-            margin-bottom: 3rem;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(153,69,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-        }
-        
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .main-logo {
-            width: 80px;
-            height: 80px;
-            background: var(--gradient-primary);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
-            box-shadow: 0 10px 30px rgba(153, 69, 255, 0.3);
-        }
-        
-        .logo-text {
-            font-size: 3.5rem;
-            font-weight: 900;
-            background: linear-gradient(45deg, var(--solana-green), var(--solana-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .tagline {
-            font-size: 1.4rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-        }
-        
-        /* Advanced Features Grid */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-        
-        .feature-card {
-            background: var(--solana-card);
-            padding: 2rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient-primary);
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--solana-purple);
-            box-shadow: 0 10px 30px rgba(153, 69, 255, 0.2);
-        }
-        
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        
-        .feature-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--solana-green);
-        }
-        
-        /* AI Trading Dashboard */
-        .ai-dashboard {
-            background: var(--solana-card);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 3rem 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .dashboard-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .metric-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1.5rem;
-            border-radius: 15px;
-            text-align: center;
-        }
-        
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--solana-green);
-        }
-        
-        /* Token Creation Wizard */
-        .creation-wizard {
-            background: var(--solana-card);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 3rem 0;
-        }
-        
-        .wizard-steps {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-        
-        .wizard-steps::before {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.1);
-            z-index: 1;
-        }
-        
-        .step {
-            background: var(--solana-dark);
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: 2px solid var(--solana-purple);
-            position: relative;
-            z-index: 2;
-        }
-        
-        .step.active {
-            background: var(--solana-purple);
-        }
-        
-        /* Wallet Integration */
-        .wallet-section {
-            text-align: center;
-            padding: 3rem;
-            background: linear-gradient(135deg, rgba(20, 241, 149, 0.1), rgba(0, 194, 255, 0.1));
-            border-radius: 20px;
-            margin: 3rem 0;
-        }
-        
-        .wallet-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-        
-        .wallet-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 15px 25px;
-            border-radius: 15px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-        }
-        
-        .wallet-btn:hover {
-            background: var(--solana-purple);
-            transform: translateY(-2px);
-        }
-        
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        
-        .btn-primary {
-            background: var(--gradient-primary);
-            color: white;
-        }
-        
-        .btn-success {
-            background: var(--gradient-success);
-            color: black;
-        }
-        
-        .btn-large {
-            padding: 15px 40px;
-            font-size: 1.1rem;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(153, 69, 255, 0.4);
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .logo-text { font-size: 2.5rem; }
-            .features-grid { grid-template-columns: 1fr; }
-            .wizard-steps { flex-direction: column; gap: 1rem; }
-            .wizard-steps::before { display: none; }
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PumpX • Token Creator (Stable)</title>
+  <style>
+    body{margin:0;background:#0d1117;color:#fff;font-family:Inter,system-ui,"Noto Sans Arabic",sans-serif}
+    .wrap{max-width:900px;margin:auto;padding:24px}
+    h1{margin:0 0 16px}
+    .card{background:#161b22;border:1px solid #2b3542;border-radius:16px;padding:18px;margin-top:16px}
+    label{display:block;margin:8px 0 4px;opacity:.9}
+    input,select,textarea,button{width:100%;border-radius:10px;border:1px solid #2b3542;background:#0f1520;color:#fff;padding:10px}
+    button{cursor:pointer;background:#238636;border:none}
+    button:hover{background:#2ea043}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .half{flex:1 1 300px}
+    .muted{opacity:.8}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    .kpis .card{padding:12px}
+    .code{word-break:break-all;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b1118;border:1px solid #2b3542;border-radius:8px;padding:8px}
+    #err{position:fixed;inset:0;background:#000c;display:none;z-index:9999}
+    #err .box{max-width:900px;margin:40px auto;background:#1a0f13;border:1px solid #ff5577;padding:16px;border-radius:12px;color:#fff}
+    #err pre{white-space:pre-wrap;direction:ltr}
+  </style>
+
+  <!-- باندل‌های آماده مرورگر (بدون importmap) -->
+  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.6/dist/browser/index.iife.min.js"></script>
 </head>
 <body>
-    <div class="language-switcher">
-        <button class="lang-btn active" onclick="switchLanguage('en')">EN</button>
-        <button class="lang-btn" onclick="switchLanguage('fa')">FA</button>
+<!-- لایه‌ی نمایش خطا -->
+<div id="err"><div class="box">
+  <div style="font-weight:800;color:#ff90a0;margin-bottom:8px">JavaScript Error</div>
+  <pre id="errmsg">...</pre>
+  <button onclick="location.reload()">Reload</button>
+</div></div>
+<script>
+  const showErr=(m)=>{
+    // اگر صفحه لوکال است، خطاهای مربوط به ServiceWorker را نشان نده
+    const skip = /ServiceWorkerRegistration|invalid state/i.test(m||"") && !/^https:/.test(location.protocol);
+    if (skip) { console.warn(m); return; }
+    document.getElementById('errmsg').textContent=m;
+    document.getElementById('err').style.display='block';
+    console.error(m);
+  };
+  window.addEventListener('error',e=>showErr('Error: '+(e.message||e.error||'unknown')),true);
+  window.addEventListener('unhandledrejection',e=>showErr('Promise rejection: '+(e.reason?.message||e.reason||'unknown')),true);
+</script>
+
+<div class="wrap">
+  <h1>🚀 PumpX Token Creator</h1>
+
+  <div class="row">
+    <div class="half">
+      <label>شبکه</label>
+      <select id="network">
+        <option value="devnet" selected>Devnet</option>
+        <option value="mainnet-beta">Mainnet</option>
+      </select>
     </div>
-
-    <div class="container">
-        <!-- Hero Header -->
-        <header class="hero-header">
-            <div class="logo-container">
-                <div class="main-logo">⚡X</div>
-                <div class="logo-text">PumpX</div>
-            </div>
-            <h1 class="tagline" data-en="Next Generation Solana Token Platform with 90% AI Management" 
-                data-fa="پلتفرم نسل جدید توکن‌های سولانا با 90% مدیریت هوش مصنوعی">
-                Next Generation Solana Token Platform with 90% AI Management
-            </h1>
-            <div class="wallet-buttons">
-                <button class="wallet-btn">
-                    <span>👻</span> Phantom Wallet
-                </button>
-                <button class="wallet-btn">
-                    <span>🔥</span> Solflare Wallet
-                </button>
-                <button class="wallet-btn">
-                    <span>📱</span> Mobile Wallets
-                </button>
-            </div>
-            <div style="margin-top: 2rem;">
-                <button class="btn btn-primary btn-large">
-                    🚀 Launch App
-                </button>
-                <button class="btn btn-success btn-large">
-                    📖 Documentation
-                </button>
-            </div>
-        </header>
-
-        <!-- Advanced Features -->
-        <section>
-            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 1rem; color: var(--solana-green);"
-                data-en="Advanced AI-Powered Features"
-                data-fa="قابلیت‌های پیشرفته هوش مصنوعی">
-                Advanced AI-Powered Features
-            </h2>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3 class="feature-title" data-en="AI Trading Engine" data-fa="موتور ترید هوشمند">AI Trading Engine</h3>
-                    <p data-en="Advanced machine learning algorithms with 90%+ accuracy rate for automated trading"
-                       data-fa="الگوریتم‌های پیشرفته یادگیری ماشین با دقت 90%+ برای ترید خودکار">
-                       Advanced machine learning algorithms with 90%+ accuracy rate for automated trading
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3 class="feature-title" data-en="Instant Token Creation" data-fa="ساخت فوری توکن">Instant Token Creation</h3>
-                    <p data-en="Create Solana tokens in 30 seconds with AI-optimized parameters"
-                       data-fa="ایجاد توکن‌های سولانا در 30 ثانیه با پارامترهای بهینه‌شده هوش مصنوعی">
-                       Create Solana tokens in 30 seconds with AI-optimized parameters
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🛡️</div>
-                    <h3 class="feature-title" data-en="Smart Security" data-fa="امنیت هوشمند">Smart Security</h3>
-                    <p data-en="AI-powered scam detection and contract auditing"
-                       data-fa="تشکلاهبرداری با هوش مصنوعی و بررسی امنیتی قراردادها">
-                       AI-powered scam detection and contract auditing
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3 class="feature-title" data-en="Advanced Analytics" data-fa="تحلیل‌گر پیشرفته">Advanced Analytics</h3>
-                    <p data-en="Real-time market analysis and predictive insights"
-                       data-fa="تحلیل لحظه‌ای بازار و بینش‌های پیش‌بینانه">
-                       Real-time market analysis and predictive insights
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🔗</div>
-                    <h3 class="feature-title" data-en="Multi-Chain Ready" data-fa="آماده چند زنجیره‌ای">Multi-Chain Ready</h3>
-                    <p data-en="Solana-first with expansion capabilities to other blockchains"
-                       data-fa="اولویت با سولانا با قابلیت گسترش به سایر بلاکچین‌ها">
-                       Solana-first with expansion capabilities to other blockchains
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🌐</div>
-                    <h3 class="feature-title" data-en="Global Community" data-fa="جامعه جهانی">Global Community</h3>
-                    <p data-en="Multi-language support and international community features"
-                       data-fa="پشتیبانی چندزبانه و قابلیت‌های جامعه بین‌المللی">
-                       Multi-language support and international community features
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- AI Trading Dashboard -->
-        <section class="ai-dashboard">
-            <div class="dashboard-header">
-                <h2 style="color: var(--solana-green);" 
-                    data-en="AI Trading Dashboard" 
-                    data-fa="داشبورد ترید هوشمند">
-                    AI Trading Dashboard
-                </h2>
-                <div class="btn btn-primary" data-en="Live Preview" data-fa="پیش‌نمایش زنده">Live Preview</div>
-            </div>
-            
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-value">94.7%</div>
-                    <div data-en="Success Rate" data-fa="نرخ موفقیت">Success Rate</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">$2.4M</div>
-                    <div data-en="Volume 24h" data-fa="حجم 24h">Volume 24h</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">1.2K</div>
-                    <div data-en="Active Traders" data-fa="تریدرهای فعال">Active Traders</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">0.3s</div>
-                    <div data-en="Avg. Execution" data-fa="میانگین اجرا">Avg. Execution</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Token Creation Wizard -->
-        <section class="creation-wizard">
-            <h2 style="text-align: center; margin-bottom: 2rem; color: var(--solana-green);"
-                data-en="3-Step Token Creation" 
-                data-fa="ساخت توکن در 3 مرحله">
-                3-Step Token Creation
-            </h2>
-            
-            <div class="wizard-steps">
-                <div class="step active" data-en="1. Configure" data-fa="1. پیکربندی">1. Configure</div>
-                <div class="step" data-en="2. Deploy" data-fa="2. استقرار">2. Deploy</div>
-                <div class="step" data-en="3. Manage" data-fa="3. مدیریت">3. Manage</div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 2rem;">
-                <button class="btn btn-success btn-large">
-                    🎯 Start Creating Token
-                </button>
-            </div>
-        </section>
-
-        <!-- Final CTA -->
-        <section class="wallet-section">
-            <h2 style="margin-bottom: 1rem;"
-                data-en="Ready to Revolutionize Your Crypto Experience?"
-                data-fa="آماده انقلاب در تجربه کریپتو خود هستید؟">
-                Ready to Revolutionize Your Crypto Experience?
-            </h2>
-            <p style="margin-bottom: 2rem; opacity: 0.9;"
-               data-en="Join thousands of users already using PumpX AI Platform"
-               data-fa="به هزاران کاربری که هم اکنون از پلتفرم هوش مصنوعی PumpX استفاده می‌کنند بپیوندید">
-               Join thousands of users already using PumpX AI Platform
-            </p>
-            
-            <div>
-                <button class="btn btn-primary btn-large">
-                    🚀 Launch PumpX Platform
-                </button>
-            </div>
-        </section>
+    <div class="half">
+      <label>کیف پول</label>
+      <select id="walletSel">
+        <option value="phantom">Phantom</option>
+        <option value="solflare">Solflare</option>
+      </select>
     </div>
+  </div>
 
-    <script>
-        // Language Switching System
-        function switchLanguage(lang) {
-            // Update buttons
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Update all elements with data attributes
-            document.querySelectorAll('[data-en]').forEach(element => {
-                if (lang === 'en') {
-                    element.textContent = element.getAttribute('data-en');
-                } else if (lang === 'fa') {
-                    element.textContent = element.getAttribute('data-fa');
-                }
-            });
-            
-            // Update HTML direction
-            document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
-            document.documentElement.lang = lang;
-        }
+  <div class="row">
+    <button id="connect" class="half">اتصال کیف</button>
+    <button id="disconnect" class="half" style="background:#444">قطع اتصال</button>
+  </div>
 
-        // Solana Color Scheme Display
-        console.log('🎨 Solana Color Scheme Applied:');
-        console.log('Purple: #9945FF');
-        console.log('Green: #14F195');
-        console.log('Blue: #00C2FF');
-        console.log('Dark: #0A0B1D');
+  <div class="kpis">
+    <div class="card"><div class="muted">Provider</div><div id="prov" class="code">—</div></div>
+    <div class="card"><div class="muted">آدرس</div><div id="addr" class="code">—</div></div>
+    <div class="card"><div class="muted">موجودی SOL</div><div id="bal" class="code">—</div></div>
+    <div class="card"><div class="muted">RPC</div><div id="rpcUsing" class="code">—</div></div>
+  </div>
 
-        // Initialize with English
-        document.addEventListener('DOMContentLoaded', function() {
-            switchLanguage('en');
-        });
-    </script>
+  <div class="card">
+    <div class="row">
+      <div class="half">
+        <label>نام توکن</label><input id="name" value="PumpX Token"/>
+      </div>
+      <div class="half">
+        <label>نماد</label><input id="symbol" value="PXPX"/>
+      </div>
+    </div>
+    <div class="row">
+      <div class="half">
+        <label>Decimals</label><input id="decimals" type="number" value="9" min="0" max="9"/>
+      </div>
+      <div class="half">
+        <label>عرضه اولیه (واحد انسانی)</label><input id="supply" type="number" value="1000000000"/>
+      </div>
+    </div>
+    <button id="create">🪙 ایجاد توکن SPL</button>
+    <div id="status" class="muted" style="margin-top:8px"></div>
+    <div id="out" class="card" style="display:none;margin-top:12px"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const { Connection, clusterApiUrl, PublicKey } = window.solanaWeb3;
+  const spl = window.splToken;
+
+  const HELIUS = "https://mainnet.helius-rpc.com/?api-key=b553d42b-55cd-48ca-bf99-e81ff18ef4d6";
+  const RPCS = {
+    "devnet": [clusterApiUrl("devnet"), "https://api.devnet.solana.com"],
+    "mainnet-beta": [HELIUS, clusterApiUrl("mainnet-beta"), "https://api.mainnet-beta.solana.com"]
+  };
+
+  const $ = id => document.getElementById(id);
+  const provEl = $("prov"), addrEl=$("addr"), balEl=$("bal"), status=$("status"), out=$("out"), rpcEl=$("rpcUsing");
+
+  let network = $("network").value;
+  let connection = new Connection(RPCS[network][0], "confirmed");
+  rpcEl.textContent = RPCS[network][0];
+
+  let provider=null, wallet=null;
+
+  $("network").onchange = async (e) => {
+    network = e.target.value;
+    connection = new Connection(RPCS[network][0], "confirmed");
+    rpcEl.textContent = RPCS[network][0];
+    await refreshBalance();
+  };
+
+  function getProvider() {
+    const w=window;
+    const sel = $("walletSel").value;
+    if (sel==="phantom") {
+      if (w?.phantom?.solana?.isPhantom) return w.phantom.solana;
+      if (w?.solana?.isPhantom) return w.solana;
+    } else {
+      if (w?.solflare?.isSolflare) return w.solflare;
+      if (w?.solana?.isSolflare) return w.solana;
+    }
+    return null;
+  }
+
+  $("connect").onclick = async () => {
+    provider = getProvider();
+    provEl.textContent = provider ? "Detected ✅" : "Not found ❌";
+    if (!provider) { alert("افزونه انتخاب‌شده نصب/باز نیست."); return; }
+    try {
+      const r = await (provider.connect ? provider.connect() : provider.request?.({method:"connect"}));
+      wallet = (r?.publicKey?.toString?.()) || provider.publicKey?.toString?.();
+      addrEl.textContent = wallet || "—";
+      await refreshBalance();
+      status.textContent = "آماده ✅";
+    } catch (e) { status.textContent="خطا: "+(e?.message||e); }
+  };
+
+  $("disconnect").onclick = async () => {
+    try{ await provider?.disconnect?.(); }catch{}
+    wallet=null; addrEl.textContent="—"; balEl.textContent="—";
+  };
+
+  async function tryBalance(url,pk) {
+    const c = new Connection(url, "confirmed"); rpcEl.textContent = url;
+    try { return await c.getBalance(pk); }
+    catch { const info = await c.getAccountInfo(pk); return info?.lamports ?? 0; }
+  }
+  async function safeBalance(pk){
+    let last; for (const url of RPCS[network]) {
+      try { return await tryBalance(url,pk); } catch(e){ last=e; }
+    } throw last;
+  }
+  async function refreshBalance(){
+    if (!wallet) { balEl.textContent="—"; return; }
+    balEl.textContent = "…";
+    try {
+      const lam = await safeBalance(new PublicKey(wallet));
+      balEl.textContent = (lam/1e9).toFixed(6);
+    } catch { balEl.textContent="خطا"; }
+  }
+
+  $("create").onclick = async () => {
+    if (!wallet || !provider) { alert("اول کیف را وصل کنید."); return; }
+    const name = $("name").value.trim();
+    const symbol = $("symbol").value.trim();
+    const decimals = Math.max(0,Math.min(9,parseInt($("decimals").value||"9",10)));
+    const supply = Number($("supply").value||"0");
+    if (!name || !symbol || !(supply>0)) { alert("مقادیر را درست وارد کنید."); return; }
+
+    try {
+      status.textContent = "در حال ساخت Mint…";
+      const signer = {
+        publicKey: new PublicKey(wallet),
+        signTransaction: (tx)=>provider.signTransaction(tx),
+        signAllTransactions: (txs)=>provider.signAllTransactions(txs)
+      };
+
+      const mintPk = await spl.createMint(
+        connection, signer,
+        new PublicKey(wallet), new PublicKey(wallet),
+        decimals, undefined, undefined, spl.TOKEN_PROGRAM_ID
+      );
+
+      status.textContent = "ساخت حساب توکن…";
+      const ata = await spl.getOrCreateAssociatedTokenAccount(
+        connection, signer, mintPk, new PublicKey(wallet)
+      );
+
+      status.textContent = "مینت عرضه اولیه…";
+      const amount = Math.round(supply * 10**decimals);
+      const sig = await spl.mintTo(connection, signer, mintPk, ata.address, new PublicKey(wallet), amount);
+
+      const cluster = network==="devnet" ? "devnet" : "";
+      const mintUrl = `https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${cluster}`;
+      const txUrl = `https://explorer.solana.com/tx/${sig}?cluster=${cluster}`;
+      out.style.display="block";
+      out.innerHTML = `
+        <div><b>Mint:</b> <div class="code">${mintPk.toBase58()}</div></div>
+        <div class="row">
+          <a class="code" target="_blank" href="${mintUrl}" style="flex:1;text-align:center">Explorer</a>
+          <a class="code" target="_blank" href="${txUrl}" style="flex:1;text-align:center">Transaction</a>
+        </div>`;
+      status.textContent = "تمام شد ✅";
+    } catch (e) {
+      console.error(e);
+      status.textContent = "خطا: " + (e?.message||e);
+    }
+  };
+})();
+</script>
 </body>
-</html>
+        </html>
