@@ -1,134 +1,318 @@
-<!DOCTYPE html>
-<html lang="fa">
+<!doctype html>
+<html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PumpX • Token Creator</title>
-  <style>
-    body {
-      background: #0d1117;
-      color: #fff;
-      font-family: sans-serif;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-    }
-    input, select, button, textarea {
-      width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #444;
-      background: #161b22;
-      color: #fff;
-    }
-    button {
-      cursor: pointer;
-      background: #238636;
-      border: none;
-    }
-    button:hover {
-      background: #2ea043;
-    }
-    .card {
-      background: #161b22;
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Mobile Trader — نرم و دقیق</title>
+<style>
+:root{
+  --bg:#0b1020; --panel:#0e1630; --ink:#f2f6ff; --muted:#b6c2d3;
+  --grid:#1a2542; --ok:#19c08a; --bad:#ea4a5b; --chip:#122046; --chip-on:#1b2e66;
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:tahoma,arial,"Vazirmatn",sans-serif}
+.app{display:flex;flex-direction:column;height:100%}
 
-  <!-- ImportMap -->
-  <script type="importmap">
-  {
-    "imports": {
-      "buffer": "https://cdn.jsdelivr.net/npm/buffer@6.0.3/+esm",
-      "process": "https://cdn.jsdelivr.net/npm/process@0.11.10/+esm",
-      "util": "https://cdn.jsdelivr.net/npm/util@0.12.5/+esm",
-      "events": "https://cdn.jsdelivr.net/npm/events@3.3.0/+esm",
-      "stream": "https://cdn.jsdelivr.net/npm/stream-browserify@3.0.0/+esm",
-      "crypto": "https://cdn.jsdelivr.net/npm/crypto-browserify@3.12.0/+esm",
+/* نوار بالا */
+.top{display:flex;align-items:center;gap:10px;padding:12px;background:var(--panel);border-bottom:1px solid rgba(255,255,255,.08)}
+.badge{display:flex;align-items:center;gap:6px;font-size:13px;border:1px solid rgba(255,255,255,.14);padding:8px 12px;border-radius:12px;background:var(--chip);color:var(--ink)}
+.badge:hover{background:var(--chip-on)}
+.brand{margin-inline-start:auto;font-weight:800}
 
-      "bn.js": "https://cdn.jsdelivr.net/npm/bn.js@5.2.1/+esm",
-      "bs58": "https://cdn.jsdelivr.net/npm/bs58@5.0.0/+esm",
-      "@solana/buffer-layout": "https://cdn.jsdelivr.net/npm/@solana/buffer-layout@4.0.1/+esm",
-      "@solana/buffer-layout-utils": "https://cdn.jsdelivr.net/npm/@solana/buffer-layout-utils@1.2.0/+esm",
-      "borsh": "https://cdn.jsdelivr.net/npm/borsh@0.7.0/lib/index.esm.js",
+/* تایم‌فریم‌های سریع */
+.tfbar{display:flex;gap:8px;overflow:auto;padding:8px 12px;background:#0c162b;border-bottom:1px solid rgba(255,255,255,.06)}
+.tfbar button{padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#15234a;color:#f4f7ff;white-space:nowrap}
+.tfbar button.active{background:#1c366d}
 
-      "@noble/curves/ed25519": "https://cdn.jsdelivr.net/npm/@noble/curves@1.2.0/ed25519.js",
-      "@noble/curves/ed448": "https://cdn.jsdelivr.net/npm/@noble/curves@1.2.0/ed448.js",
-      "@noble/curves/secp256k1": "https://cdn.jsdelivr.net/npm/@noble/curves@1.2.0/secp256k1.js",
-      "@noble/curves/abstract/weierstrass": "https://cdn.jsdelivr.net/npm/@noble/curves@1.2.0/abstract/weierstrass.js",
-      "@noble/hashes/sha512": "https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.2/sha512.js",
-      "@noble/hashes/sha256": "https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.2/sha256.js",
-      "@noble/hashes/utils": "https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.2/utils.js",
+/* چارت با حاشیهٔ راست */
+.chart-wrap{position:relative;flex:1;min-height:52vh;margin:10px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#0a1120;overflow:hidden}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.grid{position:absolute;left:10px;top:8px;display:flex;gap:10px;font-size:12px;color:#a4b2c9;z-index:2}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
 
-      "bigint-buffer": "https://esm.sh/bigint-buffer@1.1.5?target=es2020&bundle",
-      "safe-buffer": "https://cdn.jsdelivr.net/npm/safe-buffer@5.2.1/+esm",
-      "ieee754": "https://cdn.jsdelivr.net/npm/ieee754@1.2.1/+esm"
-    }
-  }
-  </script>
+/* دکمه‌های زوم */
+.zoomctl{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px;z-index:3}
+.zoomctl button{width:40px;height:40px;border-radius:12px;background:#15234a;border:1px solid rgba(255,255,255,.18);color:#ffffff;font-size:18px}
+
+/* KPI */
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:10px;background:#0d1629;border-top:1px solid rgba(255,255,255,.06)}
+.kpi .card{background:#0b1426;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px;text-align:center}
+.kv{font-weight:800}
+
+/* داک معاملات */
+.dock{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;padding:12px;background:#0b1426;border-top:1px solid rgba(255,255,255,.06)}
+.btn{background:#15234a;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px;font-size:15px;color:#ffffff}
+.buy{background:#134834;border-color:#1e7a5b}
+.sell{background:#4a1f28;border-color:#933b4d}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper .pill{min-width:72px;text-align:center;background:#15234a;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:10px;color:#ffffff}
+.stepper .ctrl{width:40px;height:40px;border-radius:10px;background:#1a2a56;border:1px solid rgba(255,255,255,.18);color:#ffffff;font-size:18px}
+
+/* مارکر و توست */
+.marker{position:absolute;transform:translate(-50%,-50%);pointer-events:none;font-size:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:#15234a;border:1px solid rgba(255,255,255,.2);padding:10px 14px;border-radius:10px}
+
+/* شیت‌ها */
+.sheet{position:fixed;left:0;right:0;bottom:-100%;background:#0c1426;border-top-left-radius:16px;border-top-right-radius:16px;border:1px solid rgba(255,255,255,.1);transition:bottom .25s ease;max-height:78vh;display:flex;flex-direction:column;z-index:1000}
+.sheet.open{bottom:0}.sheet .head{padding:10px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.08)}
+.sheet .body{padding:10px 12px;overflow:auto}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips button{border-radius:12px;background:#15234a;border:1px solid rgba(255,255,255,.18);padding:10px 12px;color:#ffffff}
+.chips button.active{background:#1c366d}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#0b1528}
+.dim{opacity:.7}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>🚀 PumpX Token Creator</h1>
-    <div class="card">
-      <label>نام توکن</label>
-      <input id="name" placeholder="PumpX Token">
-
-      <label>نماد</label>
-      <input id="symbol" placeholder="PXPX">
-
-      <label>عرضه اولیه</label>
-      <input id="supply" type="number" placeholder="1000000">
-
-      <label>توضیح</label>
-      <textarea id="desc" placeholder="توضیحی کوتاه"></textarea>
-
-      <button id="connect">اتصال کیف پول</button>
-      <button id="create">ایجاد توکن</button>
+<div class="app">
+  <div class="top">
+    <span class="badge"><input id="alertOn" type="checkbox" checked> هشدار</span>
+    <button id="btnInd" class="badge">🧮 شاخص‌ها</button>
+    <button id="btnOsc" class="badge">📈 نوسانگرها</button>
+    <button id="btnType" class="badge">📊 نوع</button>
+    <button id="btnTF" class="badge">⏱️ بازه</button>
+    <div class="brand">
+      <span id="balance">Đ010,000.00</span>
+      <span class="badge" id="acct">Demo</span>
     </div>
-    <div id="status"></div>
   </div>
 
-  <script type="module">
-    import { Connection, clusterApiUrl } from "https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/+esm";
+  <div class="tfbar" id="tfbar"></div>
 
-    const status = document.getElementById("status");
-    const btnConnect = document.getElementById("connect");
-    const btnCreate = document.getElementById("create");
+  <div class="chart-wrap" id="chartWrap">
+    <div class="grid">
+      <span class="dot" style="background:#22d3ee"></span>Price
+      <span class="dot" style="background:#19c08a"></span>EMA(f)
+      <span class="dot" style="background:#ea4a5b"></span>EMA(s)
+    </div>
+    <div class="zoomctl"><button id="zIn">＋</button><button id="zOut">－</button></div>
+    <canvas id="chart"></canvas>
+  </div>
 
-    let wallet = null;
+  <div class="kpi">
+    <div class="card"><div class="kv" id="kConf">0%</div><div>Conf</div></div>
+    <div class="card"><div class="kv" id="kSig">WAIT</div><div>Signal</div></div>
+    <div class="card"><div class="kv" id="kTrend">—</div><div>Trend</div></div>
+    <div class="card"><div class="kv" id="kLast">—</div><div>Last</div></div>
+  </div>
 
-    btnConnect.onclick = async () => {
-      try {
-        if (window.solana && window.solana.isPhantom) {
-          const resp = await window.solana.connect();
-          wallet = resp.publicKey.toString();
-          status.innerHTML = "✅ کیف پول متصل شد: " + wallet;
-        } else {
-          status.innerHTML = "❌ افزونه Phantom نصب نیست";
-        }
-      } catch (err) {
-        status.innerHTML = "⚠️ خطا در اتصال: " + err.message;
-      }
-    };
+  <div class="dock">
+    <div style="display:flex;gap:10px">
+      <button class="btn buy" id="btnBuy">⬆️ خرید</button>
+      <button class="btn sell" id="btnSell">⬇️ فروش</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="stepper">
+        <button class="ctrl" id="amtMinus">−</button>
+        <div class="pill" id="amt">Đ 230</div>
+        <button class="ctrl" id="amtPlus">+</button>
+      </div>
+      <button class="btn" id="btnAI">🤖 ترید هوش مصنوعی</button>
+    </div>
+    <div class="btn" id="durBtn">مدت: <b id="durLbl">1m</b></div>
+  </div>
+</div>
 
-    btnCreate.onclick = async () => {
-      if (!wallet) {
-        status.innerHTML = "⛔ اول کیف پول را متصل کنید.";
-        return;
-      }
-      const name = document.getElementById("name").value;
-      const symbol = document.getElementById("symbol").value;
-      const supply = document.getElementById("supply").value;
-      status.innerHTML = `⏳ در حال ساخت ${name} (${symbol}) با عرضه ${supply}`;
-      // اینجا بعداً کد ساخت توکن SPL اضافه میشه
-    };
-  </script>
+<!-- شیت‌ها (همان قبلی) -->
+<div id="sheetTF" class="sheet"><div class="head"><div>بازهٔ زمانی</div><button class="btn" data-close="sheetTF">✕</button></div><div class="body"><div class="chips" id="tfList"></div></div></div>
+<div id="sheetType" class="sheet"><div class="head"><div>نوع نمودار</div><button class="btn" data-close="sheetType">✕</button></div>
+  <div class="body chips" id="typeList"><button data-type="candles">شمعی</button><button data-type="heikin">هیکن آشی</button><button data-type="bars">میله‌ای</button><button data-type="area">مساحت</button></div></div>
+<div id="sheetInd" class="sheet"><div class="head"><div>شاخص‌ها</div><button class="btn" data-close="sheetInd">✕</button></div>
+  <div class="body"><div class="item"><label><input id="iEMA" type="checkbox" checked> EMA</label>
+    <div><input id="emaF" value="9" style="width:68px"> <span class="dim">fast</span>
+    <input id="emaS" value="26" style="width:68px"> <span class="dim">slow</span></div></div></div></div>
+<div id="sheetOsc" class="sheet"><div class="head"><div>نوسانگرها</div><button class="btn" data-close="sheetOsc">✕</button></div>
+  <div class="body">
+    <div class="item"><label><input id="oRSI" type="checkbox" checked> RSI</label>
+      <div><input id="rsiLen" value="14" style="width:68px"><span class="dim">len</span></div></div>
+    <div class="item"><label><input id="oMACD" type="checkbox"> MACD</label><div class="dim">12/26/9</div></div>
+    <div class="item"><label><input id="oSTO" type="checkbox"> Stochastic</label>
+      <div><input id="stoLen" value="14" style="width:68px"><span class="dim">%K</span></div></div>
+  </div>
+</div>
+
+<script>
+/* ======= بدون تغییر در UI — فقط دریافت دیتا لایو ======= */
+const $=id=>document.getElementById(id);
+const fmt=n=>isFinite(n)?Number(n).toLocaleString('en-US',{maximumFractionDigits:3}):'—';
+const S={tf:'5m',type:'candles',bars:[],amt:230,mode:'Demo',balance:10000,orders:[]};
+
+const TFs=['5m','2m','1m','30s','20s','15s','10s','5s'];
+function openSheet(id){document.getElementById(id).classList.add('open')}
+function closeSheet(id){document.getElementById(id).classList.remove('open')}
+document.addEventListener('click',e=>{
+  const t=e.target;
+  if(t.id==='btnTF')openSheet('sheetTF');
+  if(t.id==='btnType')openSheet('sheetType');
+  if(t.id==='btnInd')openSheet('sheetInd');
+  if(t.id==='btnOsc')openSheet('sheetOsc');
+  if(t.dataset?.close)closeSheet(t.dataset.close);
+});
+const tfbar=$('tfbar'), tfList=$('tfList');
+TFs.forEach(tf=>{
+  const b1=document.createElement('button'); b1.textContent=tf; b1.dataset.tf=tf; b1.onclick=()=>setTF(tf); tfbar.appendChild(b1);
+  const b2=document.createElement('button'); b2.textContent=tf; b2.dataset.tf=tf; b2.onclick=()=>{setTF(tf);closeSheet('sheetTF')}; tfList.appendChild(b2);
+});
+function paintTF(){document.querySelectorAll('[data-tf]').forEach(b=>b.classList.toggle('active',b.dataset.tf===S.tf))}
+function setTF(tf){S.tf=tf; paintTF(); /* نیازی به تغییر اتصال نیست؛ باین محلی بر اساس tf جدید انجام می‌شود */}
+
+/* Canvas + گاترها (بدون تغییر) */
+const c=$('chart'), g=c.getContext('2d'), wrap=$('chartWrap');
+const V={count:200,off:0,drag:false,lastX:0,pinch:false,lastD:0,rightGutter:44,topPadRatio:0.12};
+function resize(){const pr=window.devicePixelRatio||1;c.width=c.clientWidth*pr;c.height=c.clientHeight*pr;g.setTransform(pr,0,0,pr,0,0);draw()}
+window.addEventListener('resize',resize);
+function grid(w,h){g.strokeStyle='rgba(255,255,255,.08)';g.lineWidth=1;g.beginPath();for(let i=1;i<10;i++){const x=i*(w-V.rightGutter)/10;g.moveTo(x,0);g.lineTo(x,h)}for(let j=1;j<6;j++){const y=j*h/6;g.moveTo(0,y);g.lineTo(w,y)}g.stroke()}
+function wheel(e){e.preventDefault();const d=e.deltaY>0?1:-1;V.count=Math.max(60,Math.min(360,V.count+d*16));draw()}
+function dist(a,b){const dx=a.clientX-b.clientX,dy=a.clientY-b.clientY;return Math.hypot(dx,dy)}
+function start(ev){if(ev.touches?.length===2){V.pinch=true;V.lastD=dist(ev.touches[0],ev.touches[1]);return}V.drag=true;V.lastX=(ev.touches?ev.touches[0].clientX:ev.clientX)}
+function move(ev){if(V.pinch && ev.touches?.length===2){const d=dist(ev.touches[0],ev.touches[1]);V.count=Math.max(60,Math.min(360,V.count-(d-V.lastD)/3));V.lastD=d;draw();return}
+  if(!V.drag)return;const x=(ev.touches?ev.touches[0].clientX:ev.clientX);const dx=x-V.lastX;V.lastX=x;const step=Math.max(1,Math.round(dx/((c.clientWidth-V.rightGutter)/Math.max(10,V.count-1))));V.off=Math.max(0,Math.min(Math.max(0,S.bars.length-V.count),V.off-step));draw()}
+function end(){V.drag=false;V.pinch=false}
+c.addEventListener('wheel',wheel,{passive:false});['mousedown','touchstart'].forEach(e=>c.addEventListener(e,start,{passive:false}));['mousemove','touchmove'].forEach(e=>c.addEventListener(e,move,{passive:false}));['mouseup','mouseleave','touchend','touchcancel'].forEach(e=>c.addEventListener(e,end));
+$('zIn').onclick=()=>{V.count=Math.max(60,V.count-20);draw()}
+$('zOut').onclick=()=>{V.count=Math.min(360,V.count+20);draw()}
+
+/* اندیکاتورها (بدون تغییر) */
+const EMA=(a,p)=>{const k=2/(p+1);let e;return a.map((v,i)=>e=i? v*k+e*(1-k):v)};
+function RSI(arr,len=14){let rsis=[]; let gains=0,losses=0;
+  for(let i=1;i<arr.length;i++){const ch=arr[i]-arr[i-1]; const g=Math.max(0,ch),l=Math.max(0,-ch);
+    if(i<=len){gains+=g;losses+=l; rsis.push(undefined); if(i===len){const rs=(gains/len)/(losses/len||1e-9); rsis.push(100-100/(1+rs));}}
+    else{gains=(gains*(len-1)+g)/len; losses=(losses*(len-1)+l)/len; const rs=gains/(losses||1e-9); rsis.push(100-100/(1+rs));}
+  }
+  return [undefined,...rsis];
+}
+function MACD(arr){const e12=EMA(arr,12), e26=EMA(arr,26); const macd=e12.map((v,i)=>v-(e26[i]??v)); const signal=EMA(macd.map(v=>v??0),9); return {macd,signal};}
+function STO(arr,len=14){const out=[];for(let i=0;i<arr.length;i++){if(i<len-1){out.push(undefined);continue}const s=arr.slice(i-len+1,i+1);const hi=Math.max(...s),lo=Math.min(...s); out.push(((arr[i]-lo)/(hi-lo||1e-9))*100);}return out}
+
+/* رسم (بدون تغییر) */
+function getView(){const n=S.bars.length;const st=Math.max(0,n-V.count-V.off);return S.bars.slice(st,st+V.count)}
+function draw(){
+  const w=c.clientWidth,h=c.clientHeight; g.clearRect(0,0,w,h); g.fillStyle='#0a1120'; g.fillRect(0,0,w,h); grid(w,h);
+  if(!S.bars.length) return;
+  const vw=w-V.rightGutter;
+  const view=getView(); let hi=Math.max(...view.map(b=>b.h??b.c)), lo=Math.min(...view.map(b=>b.l??b.c));
+  const pad=(hi-lo)*V.topPadRatio; hi+=pad;
+  const step=vw/(view.length-1||1);
+  for(let i=0;i<view.length;i++){
+    const raw=view[i]; let o=raw.o,hH=raw.h,lL=raw.l,cC=raw.c;
+    if(S.type==='heikin'){const prev=view[i-1]||raw; const haC=(o+hH+lL+cC)/4; const haO=(prev.o+prev.c)/2; o=haO; cC=haC; hH=Math.max(hH,haO,haC); lL=Math.min(lL,haO,haC)}
+    const x=i*step; const yO=h-((o-lo)/(hi-lo))*h, yC=h-((cC-lo)/(hi-lo))*h, yH=h-((hH-lo)/(hi-lo))*h, yL=h-((lL-lo)/(hi-lo))*h;
+    g.strokeStyle='rgba(255,255,255,.38)'; g.beginPath(); g.moveTo(x,yH); g.lineTo(x,yL); g.stroke();
+    if(S.type==='bars'){g.fillStyle='#e5e7eb'; g.fillRect(x-0.5,yO,Math.max(1,step*0.3),1.5); g.fillRect(x-0.5,yC,Math.max(1,step*0.3),1.5)}
+    else if(S.type==='area'){g.strokeStyle='#22d3ee'; g.lineWidth=2; if(i){g.lineTo(x,yC)}else{g.beginPath();g.moveTo(x,yC)} g.stroke()}
+    else { g.fillStyle=(cC>=o)?'#19c08a':'#ea4a5b'; const wC=Math.max(1,step*0.6); g.fillRect(x-wC/2,Math.min(yO,yC),wC,Math.max(2,Math.abs(yO-yC))); }
+  }
+  if($('iEMA').checked){const closes=S.bars.map(b=>b.c); const ef=EMA(closes,+$('emaF').value||9), es=EMA(closes,+$('emaS').value||26); const start=S.bars.length-view.length;
+    const line=(arr,col)=>{g.strokeStyle=col; g.lineWidth=2; g.beginPath(); for(let i=0;i<view.length;i++){const v=arr[start+i]; if(!isFinite(v))continue; const x=i*step, y=h-((v-lo)/(hi-lo))*h; i?g.lineTo(x,y):g.moveTo(x,y)} g.stroke()};
+    line(ef,'#19c08a'); line(es,'#ea4a5b');
+  }
+  drawOrders(view,step,h,lo,hi);
+}
+
+/* سیگنال / دمو (بدون تغییر) */
+function analyze(){
+  if(!S.bars.length) return;
+  const c=S.bars.map(b=>b.c), ef=EMA(c,+$('emaF').value||9), es=EMA(c,+$('emaS').value||26), last=c.at(-1);
+  $('kLast').textContent=fmt(last);
+  const up=ef.at(-1)>es.at(-1); $('kTrend').textContent=up?'Up':'Down';
+  let score=50; const cross=Math.sign(ef.at(-1)-es.at(-1))-Math.sign(ef.at(-2)-es.at(-2)); if(cross>0)score+=18; else if(cross<0)score-=18;
+  if(last>ef.at(-1))score+=8; else score-=8;
+  if($('oRSI').checked){const r=RSI(c,+$('rsiLen').value||14).at(-1); if(isFinite(r)){ if(r<30)score+=10; else if(r>70)score-=10; }}
+  if($('oMACD').checked){const {macd,signal}=MACD(c); if(isFinite(macd.at(-1))&&isFinite(signal.at(-1))){const d=macd.at(-1)-signal.at(-1); score+= Math.max(-10,Math.min(10, d*2));}}
+  if($('oSTO').checked){const st=STO(c,+$('stoLen').value||14).at(-1); if(isFinite(st)){ if(st<20)score+=8; else if(st>80)score-=8; }}
+  score=Math.max(0,Math.min(100,Math.round(score))); $('kConf').textContent=score+'%';
+  const sig=score>=65?'BUY':(score<=35?'SELL':'WAIT'); $('kSig').textContent=sig;
+  if($('alertOn').checked && (sig==='BUY'||sig==='SELL') && score>=70){ try{navigator.vibrate?.(120)}catch{} }
+}
+
+const wrapEl=$('chartWrap'); const orders=()=>S.orders;
+function drawOrders(view,step,h,lo,hi){
+  document.querySelectorAll('.marker').forEach(n=>n.remove());
+  for(const o of orders()){
+    const x=(view.length-1)*step; const y=h-((o.open-lo)/(hi-lo))*h;
+    const m=document.createElement('div'); m.className='marker'; m.style.left=x+'px'; m.style.top=y+'px';
+    m.innerHTML=`<span style="padding:4px 6px;border-radius:8px;background:${o.side==='BUY'?'#11382b':'#3a1a1e'};border:1px solid rgba(255,255,255,.25);color:#fff">${o.side==='BUY'?'⬆️':'⬇️'} ${fmt(o.open)}</span><div style="text-align:center;margin-top:2px;color:#fff">${Math.max(0,Math.ceil((o.tClose-Date.now())/1000))}s</div>`;
+    wrapEl.appendChild(m);
+  }
+}
+function durationMs(){const lbl=$('durLbl').textContent; if(lbl.endsWith('s'))return parseInt(lbl)*1000; if(lbl.endsWith('m'))return parseInt(lbl)*60*1000; return 60000}
+function openOrder(side){if(!S.bars.length){toast('قیمت هنوز نرسیده');return} const now=Date.now(); const dur=durationMs(); const o={id:Math.random().toString(36).slice(2),side,open:S.bars.at(-1).c,tOpen:now,tClose:now+dur,amt:S.amt,closed:false}; S.orders.push(o); toast('سفارش دمو '+(side==='BUY'?'خرید':'فروش')+' باز شد'); draw()}
+function settleOrders(){const now=Date.now(); const last=S.bars.at(-1)?.c; if(!isFinite(last))return;
+  for(const o of S.orders){ if(!o.closed && now>=o.tClose){ o.closed=true; const win=(o.side==='BUY'? last>o.open : last<o.open); S.balance += win? o.amt*0.85 : -o.amt; toast((win?'برد: ':'باخت: ')+ (win?'+':'-')+'Đ'+o.amt.toFixed(0)); } }
+  S.orders=S.orders.filter(o=>!o.closed || now-now<2000); $('balance').textContent='Đ'+S.balance.toFixed(2);
+}
+
+/* ====== اتصال لایو (Binance aggTrade) و باین به کندل ====== */
+const CONFIG = {
+  EXCHANGE: 'binance',
+  SYMBOL: 'btcusdt', // ← اینجا را اگر خواستی عوض کن (مثلاً ethusdt)
+  WS: (sym)=>`wss://stream.binance.com:9443/ws/${sym}@aggTrade`
+};
+
+// طول بازه بر حسب میلی‌ثانیه از روی برچسب S.tf
+function tfSpan(){
+  if(/s$/.test(S.tf)) return parseInt(S.tf)*1000;
+  return (parseInt(S.tf)||1)*60*1000;
+}
+
+// نگهداری کندل‌های باینِ‌شده از تیک‌ها
+let ws=null, lastTradePrice=null;
+function ensureCapacity(){ if(S.bars.length>1600){ S.bars.splice(0,S.bars.length-1600); }}
+
+// افزودن/به‌روزرسانی کندل از روی تیک
+function upsertFromTick(price, tms){
+  lastTradePrice = price;
+  const span=tfSpan();
+  const base = tms - (tms % span);
+  const n=S.bars.length;
+  if(!n || S.bars[n-1].t!==base){
+    // کندل جدید
+    S.bars.push({t:base,o:price,h:price,l:price,c:price});
+    ensureCapacity();
+  } else {
+    // آپدیت کندل جاری
+    const b=S.bars[n-1];
+    b.c=price; b.h=Math.max(b.h,price); b.l=Math.min(b.l,price);
+  }
+}
+
+// اتصال وب‌سوکت
+function connectLive(){
+  try{ ws?.close?.() }catch{}
+  const url = CONFIG.WS(CONFIG.SYMBOL);
+  ws = new WebSocket(url);
+  ws.onopen = ()=> toast('اتصال لایو باز شد');
+  ws.onclose = ()=> { toast('اتصال بسته شد، تلاش مجدد...'); setTimeout(connectLive, 1500); };
+  ws.onerror = ()=> {/* بی‌صدا */};
+  ws.onmessage = (ev)=>{
+    try{
+      const d = JSON.parse(ev.data); // binance aggTrade
+      const price = parseFloat(d.p);
+      const tms = (d.T || Date.now());
+      if(isFinite(price)) upsertFromTick(price, tms);
+    }catch{}
+  };
+}
+
+/* اکشن‌ها */
+$('amtMinus').onclick=()=>{S.amt=Math.max(1,S.amt-10);$('amt').textContent='Đ '+S.amt}
+$('amtPlus').onclick=()=>{S.amt+=10;$('amt').textContent='Đ '+S.amt}
+$('btnAI').onclick=()=>{const s=$('kSig').textContent;if(s==='WAIT')toast('🤖 هنوز سیگنال قوی نیست');else openOrder(s)}
+$('btnBuy').onclick=()=>openOrder('BUY'); $('btnSell').onclick=()=>openOrder('SELL')
+$('durBtn').onclick=()=>{const seq=['30s','1m','5m'];const cur=$('durLbl').textContent;const i=(seq.indexOf(cur)+1)%seq.length;$('durLbl').textContent=seq[i];}
+
+/* نوع نمودار */
+document.getElementById('typeList').addEventListener('click',e=>{if(e.target.dataset.type){S.type=e.target.dataset.type; closeSheet('sheetType'); draw()}})
+
+/* حلقه رندر (بدون دیتا تصادفی) */
+function tick(){ if(S.bars.length){ draw(); analyze(); settleOrders(); $('kLast').textContent=fmt(S.bars.at(-1).c); } requestAnimationFrame(tick); }
+
+/* راه‌اندازی */
+window.addEventListener('load',()=>{
+  resize(); setTF('5m'); paintTF(); $('amt').textContent='Đ '+S.amt; $('balance').textContent='Đ'+S.balance.toFixed(2);
+  connectLive();
+  tick();
+});
+</script>
 </body>
 </html>
