@@ -3,42 +3,55 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PumpX • Safe v2 (jsDelivr ESM + Error Overlay)</title>
+<title>PumpX • Pro (AI + IPFS + Fix buffer)</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+
 <style>
   :root{--bg:#0b0f1a;--card:#0f1524;--line:#334466;--accent:#79d9ff}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:#fff;font-family:Inter,system-ui,"Noto Sans Arabic",sans-serif}
-  a{color:var(--accent)}
-  .wrap{max-width:1100px;margin:auto;padding:20px}
+  a{color:var(--accent);text-decoration:none}
+  .wrap{max-width:1200px;margin:auto;padding:20px}
   .nav{position:sticky;top:0;background:#0b0f1acc;border-bottom:1px solid #ffffff22;backdrop-filter:blur(8px);z-index:50}
-  .navin{display:flex;justify-content:space-between;align-items:center;height:64px}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .card{background:#0f1524;border:1px solid #ffffff22;border-radius:16px;padding:16px;margin:12px 0}
+  .navin{display:flex;gap:10px;justify-content:space-between;align-items:center;height:64px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{padding:10px 14px;border-radius:12px;border:1px solid #ffffff22;background:#121a2c;cursor:pointer}
+  .tab.active{background:#1b2744}
   .btn{background:#1b2744;border:1px solid #445;color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer}
   .btn:disabled{opacity:.5;cursor:not-allowed}
-  .input,.select,.textarea{background:#121a2c;border:1px solid #445;color:#fff;border-radius:12px;padding:10px 12px}
+  .select,.input,.textarea{background:#121a2c;border:1px solid var(--line);color:#fff;border-radius:12px;padding:10px 12px}
   .textarea{min-height:90px;resize:vertical}
+  .card{background:#0f1524;border:1px solid #ffffff22;border-radius:18px;padding:16px;margin:14px 0}
   .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   @media(max-width:900px){.grid{grid-template-columns:1fr}}
-  .code{background:#0b0f1a;border:1px solid #445;border-radius:10px;padding:8px 10px;word-break:break-all}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .muted{opacity:.8;font-size:13px}
-  /* Error overlay */
+  .code{background:#0b0f1a;border:1px solid #445;border-radius:10px;padding:8px 10px;word-break:break-all}
+  .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .kpi{background:#0f1524;border:1px solid #ffffff22;border-radius:16px;padding:12px}
+  .card-sm{background:#10172a;border:1px solid #ffffff22;border-radius:14px;padding:12px}
   #err{position:fixed;inset:0;background:#000c;color:#fff;display:none;z-index:9999}
   #err .box{max-width:900px;margin:40px auto;background:#1a0f13;border:1px solid #ff4978;padding:16px;border-radius:12px}
   #err pre{white-space:pre-wrap;direction:ltr}
 </style>
 </head>
 <body>
+<!-- Error Overlay -->
 <div id="err"><div class="box">
   <div style="font-weight:800;color:#ff7aa6">JavaScript Error</div>
   <pre id="errmsg">...</pre>
   <button class="btn" onclick="location.reload()">Reload</button>
 </div></div>
+<script>
+  const _showErr=(m)=>{document.getElementById('errmsg').textContent=m;document.getElementById('err').style.display='block';console.error(m);};
+  window.addEventListener('error',e=>_showErr('Error: '+(e.message||e.error||'unknown')),true);
+  window.addEventListener('unhandledrejection',e=>_showErr('Promise rejection: '+(e.reason?.message||e.reason||'unknown')),true);
+</script>
 
 <div class="nav">
   <div class="wrap navin">
-    <div class="row"><div style="font-weight:900;letter-spacing:.12em">PumpX</div><span class="muted">Safe v2</span></div>
+    <div class="row"><div style="font-weight:900;letter-spacing:.12em">PumpX</div><span class="muted">Pro</span></div>
     <div class="row">
       <select id="network" class="select">
         <option value="devnet" selected>Devnet</option>
@@ -51,15 +64,22 @@
 </div>
 
 <div class="wrap">
-  <div class="card">
-    <div class="row"><span class="muted">Provider:</span><span id="prov" class="code">—</span></div>
-    <div class="row"><span class="muted">آدرس:</span><span id="addr" class="code">—</span></div>
-    <div class="row"><span class="muted">موجودی SOL:</span><span id="bal" class="code">—</span></div>
-    <div class="row"><span class="muted">RPC فعال:</span><span id="rpcUsing" class="code">—</span></div>
-    <div id="https" class="muted"></div>
+  <div class="tabs">
+    <div class="tab active" data-page="create">ساخت توکن</div>
+    <div class="tab" data-page="swap">خرید/فروش</div>
+    <div class="tab" data-page="ai">دستیار هوش مصنوعی</div>
+    <div class="tab" data-page="support">پشتیبانی</div>
   </div>
 
-  <div class="card">
+  <div class="kpis">
+    <div class="kpi"><div class="muted">Provider</div><div id="prov" class="code">—</div></div>
+    <div class="kpi"><div class="muted">آدرس</div><div id="addr" class="code">—</div></div>
+    <div class="kpi"><div class="muted">موجودی SOL</div><div id="bal" class="code">—</div></div>
+    <div class="kpi"><div class="muted">RPC فعال</div><div id="rpcUsing" class="code">—</div></div>
+  </div>
+
+  <!-- CREATE -->
+  <section id="page-create" class="card">
     <h2 style="margin:0 0 10px">ساخت توکن (SPL) + متادیتا (IPFS)</h2>
     <div class="grid">
       <label>نام<input id="name" class="input" value="PumpX Token"></label>
@@ -76,108 +96,89 @@
       <span id="status" class="muted"></span>
     </div>
     <div id="result" class="card" style="display:none;margin-top:12px"></div>
-  </div>
+  </section>
+
+  <!-- SWAP -->
+  <section id="page-swap" class="card" style="display:none">
+    <h2 style="margin:0 0 10px">خرید/فروش — Jupiter</h2>
+    <div id="swapBox" class="card-sm" style="height:620px">
+      <iframe id="jup" src="https://jup.ag/swap/SOL" style="width:100%;height:600px;border:0;border-radius:12px;background:#0b0f1a"></iframe>
+    </div>
+    <div class="row">
+      <label style="flex:1">آدرس توکن
+        <input id="swapMint" class="input" placeholder="Mint address"/>
+      </label>
+      <button id="setSwap" class="btn">تنظیم SOL ↔︎ Token</button>
+      <button id="setPXPX" class="btn">SOL ↔︎ PXPX</button>
+    </div>
+  </section>
+
+  <!-- AI -->
+  <section id="page-ai" class="card" style="display:none">
+    <h2 style="margin:0 0 10px">دستیار هوش مصنوعی</h2>
+    <div class="grid">
+      <label>OpenAI API Key (اختیاری)<input id="openai" class="input" placeholder="sk-..."></label>
+      <label>تم/کلیدواژه‌ها<input id="theme" class="input" value="میم، جهانی، نئونی"></label>
+      <label style="grid-column:1/-1">متن توضیح/رودمپ<textarea id="desc" class="textarea"></textarea></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="aiBrand" class="btn">پیشنهاد نام/نماد/Story</button>
+      <button id="aiRisk" class="btn">تحلیل ریسک/اعتماد</button>
+      <span id="aiStatus" class="muted"></span>
+    </div>
+    <div id="riskOut" class="card-sm" style="display:none;margin-top:10px"></div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section id="page-support" class="card" style="display:none">
+    <h2 style="margin:0 0 10px">پشتیبانی</h2>
+    <p>ایمیل: <a href="mailto:support@pumpx.info">support@pumpx.info</a></p>
+    <p class="muted">ساعات پاسخ‌گویی آزمایشی: ۲۰ ساعت. سلب مسئولیت: PumpX بستر فنی است و قول سود نمی‌دهد.</p>
+  </section>
 </div>
 
-<script>
-  // Error overlay
-  (function(){
-    const show = (msg)=>{
-      document.getElementById('errmsg').textContent = msg;
-      document.getElementById('err').style.display='block';
-      console.error(msg);
-    };
-    window.addEventListener('error', e=> show('Error: '+(e.message||e.error||'unknown')), true);
-    window.addEventListener('unhandledrejection', e=> show('Promise rejection: '+(e.reason?.message||e.reason||'unknown')), true);
-  })();
+<!-- Import map: پلی‌فیل برای ماژول‌های Node که spl-token می‌خواهد -->
+<script type="importmap">
+{
+  "imports": {
+    "buffer": "https://cdn.jsdelivr.net/npm/buffer@6.0.3/+esm",
+    "process": "https://cdn.jsdelivr.net/npm/process@0.11.10/+esm",
+    "util": "https://cdn.jsdelivr.net/npm/util@0.12.5/+esm",
+    "events": "https://cdn.jsdelivr.net/npm/events@3.3.0/+esm",
+    "stream": "https://cdn.jsdelivr.net/npm/stream-browserify@3.0.0/+esm",
+    "crypto": "https://cdn.jsdelivr.net/npm/crypto-browserify@3.12.0/+esm"
+  }
+}
 </script>
 
 <script type="module">
-/* ===== فقط web3.js را از jsDelivr لود می‌کنیم ===== */
+/* ===== web3.js از jsDelivr ===== */
 import { Connection, clusterApiUrl, PublicKey } from "https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.browser.esm.js";
 
+/* ===== متغیرهای UI ===== */
 const $=id=>document.getElementById(id);
-$("https").textContent = location.protocol.startsWith("https") ? "HTTPS: بله ✅" : "HTTPS: خیر ❌ — حتماً با HTTPS باز کنید.";
+document.querySelectorAll(".tab").forEach(t=>{t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");const pg=t.dataset.page;document.querySelectorAll("section[id^='page-']").forEach(s=>s.style.display="none");$("page-"+pg).style.display="block";};});
 
+/* ===== RPC پنهان شما ===== */
 const HELIUS_MAINNET_URL="https://mainnet.helius-rpc.com/?api-key=b553d42b-55cd-48ca-bf99-e81ff18ef4d6";
-const RPCS={
-  "devnet":[clusterApiUrl("devnet"),"https://api.devnet.solana.com","https://devnet.rpcpool.com"],
-  "mainnet-beta":[HELIUS_MAINNET_URL,clusterApiUrl("mainnet-beta"),"https://api.mainnet-beta.solana.com"]
-};
+const RPCS={ "devnet":[clusterApiUrl("devnet"),"https://api.devnet.solana.com"], "mainnet-beta":[HELIUS_MAINNET_URL,clusterApiUrl("mainnet-beta"),"https://api.mainnet-beta.solana.com"] };
+let network="devnet"; let connection=new Connection(RPCS[network][0],"confirmed");
+const rpcUsingEl=$("rpcUsing"); rpcUsingEl.textContent=RPCS[network][0];
 
-let network="devnet";
-let connection=new Connection(RPCS[network][0],"confirmed");
+/* ===== کیف پول ===== */
 let provider=null, wallet=null;
+function getProvider(){const w=window; if(w?.phantom?.solana?.isPhantom) return w.phantom.solana; if(w?.solana?.isPhantom) return w.solana; if(w?.solflare) return w.solflare; if(w?.solana?.isSolflare) return w.solana; return null;}
+const provEl=$("prov"),addrEl=$("addr"),balEl=$("bal"),statusEl=$("status");
+$("network").onchange=async e=>{network=e.target.value; connection=new Connection(RPCS[network][0],"confirmed"); rpcUsingEl.textContent=RPCS[network][0]; await refreshBalance();};
+$("connect").onclick=async()=>{provider=getProvider(); provEl.textContent=provider?"OK ✅":"Not found ❌"; if(!provider) return alert("Phantom یا Solflare نصب/باز شود."); try{const r=await(provider.connect?provider.connect():provider.request({method:"connect"})); wallet=r?.publicKey?.toString?.()||provider.publicKey?.toString?.(); addrEl.textContent=wallet||"—"; $("connect").style.display="none"; $("disconnect").style.display="inline-block"; $("createToken").disabled=false; await refreshBalance(); }catch(e){ statusEl.textContent=e?.message||e; }};
+$("disconnect").onclick=async()=>{try{await provider?.disconnect?.();}catch{} wallet=null; addrEl.textContent="—"; balEl.textContent="—"; $("connect").style.display="inline-block"; $("disconnect").style.display="none";};
+async function tryBalance(url,pk){const conn=new Connection(url,"confirmed"); rpcUsingEl.textContent=url; try{return await conn.getBalance(pk);}catch{const i=await conn.getAccountInfo(pk);return i?.lamports??0;}}
+async function safeBalance(pk){let last; for(const url of RPCS[network]){try{return await tryBalance(url,pk);}catch(e){last=e;}} throw last;}
+async function refreshBalance(){if(!wallet){balEl.textContent="—";return;} balEl.textContent="…"; try{const lam=await safeBalance(new PublicKey(wallet)); balEl.textContent=(lam/1e9).toFixed(6);}catch{balEl.textContent="خطا";}}
 
-const provEl=$("prov"),addrEl=$("addr"),balEl=$("bal"),rpcUsingEl=$("rpcUsing"),statusEl=$("status");
-rpcUsingEl.textContent=RPCS[network][0];
-
-function getProvider(){
-  const w=window;
-  if (w?.phantom?.solana?.isPhantom) return w.phantom.solana;
-  if (w?.solana?.isPhantom) return w.solana;
-  if (w?.solflare) return w.solflare;
-  if (w?.solana?.isSolflare) return w.solana;
-  return null;
-}
-async function tryBalance(url,pk){
-  const conn=new Connection(url,"confirmed");
-  rpcUsingEl.textContent=url;
-  try{return await conn.getBalance(pk);}catch{const i=await conn.getAccountInfo(pk); return i?.lamports??0;}
-}
-async function safeBalance(pk){
-  let last; for(const url of RPCS[network]){ try{ return await tryBalance(url,pk);}catch(e){last=e;} }
-  throw last;
-}
-async function refreshBalance(){
-  if(!wallet){ balEl.textContent="—"; return; }
-  balEl.textContent="…";
-  try{
-    const lamports=await safeBalance(new PublicKey(wallet));
-    balEl.textContent=(lamports/1e9).toFixed(6);
-  }catch(e){ balEl.textContent="خطا"; }
-}
-
-$("network").onchange=async e=>{
-  network=e.target.value;
-  connection=new Connection(RPCS[network][0],"confirmed");
-  rpcUsingEl.textContent=RPCS[network][0];
-  await refreshBalance();
-};
-
-$("connect").onclick=async ()=>{
-  provider=getProvider(); provEl.textContent=provider?"OK ✅":"Not found ❌";
-  if(!provider){ alert("Phantom یا Solflare نصب/باز شود."); return; }
-  try{
-    const r=await (provider.connect?provider.connect():provider.request({method:"connect"}));
-    wallet=r?.publicKey?.toString?.() || provider.publicKey?.toString?.();
-    addrEl.textContent=wallet||"—";
-    $("connect").style.display="none"; $("disconnect").style.display="inline-block";
-    $("createToken").disabled=false;
-    await refreshBalance();
-  }catch(e){ statusEl.textContent=e?.message||e; }
-};
-
-$("disconnect").onclick=async ()=>{
-  try{ await provider?.disconnect?.(); }catch{}
-  wallet=null; addrEl.textContent="—"; balEl.textContent="—";
-  $("connect").style.display="inline-block"; $("disconnect").style.display="none";
-};
-
-/* ===== کمک‌ها ===== */
-async function uploadNFTStorage(blob,token){
-  const r=await fetch("https://api.nft.storage/upload",{method:"POST",headers:{"Authorization":"Bearer "+token},body:blob});
-  const j=await r.json(); if(!j.ok) throw new Error("NFT.Storage failed"); return "ipfs://"+j.value.cid;
-}
-function pumpxSVG(){
-  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='1024' height='1024' viewBox='0 0 1024 1024'>
-    <rect width='1024' height='1024' fill='#0b0f1a'/>
-    <g transform='translate(128,128)'><circle cx='384' cy='384' r='360' fill='none' stroke='#bfc7d6' stroke-width='24'/>
-    <path d='M240 200h160c96 0 160 64 160 152s-64 152-160 152H320v120h-80V200z' fill='#3aa0ff'/>
-    <path d='M320 336l56 56 92-92 44 44 84-84' fill='none' stroke='#2b74c8' stroke-width='24' stroke-linecap='round' stroke-linejoin='round'/>
-    <path d='M260 680v-110l120-120' fill='none' stroke='#2b74c8' stroke-width='22' stroke-linecap='round'/></g></svg>`;
-  return new Blob([svg],{type:"image/svg+xml"});
-}
+/* ===== کمک‌های IPFS و SVG ===== */
+async function uploadNFTStorage(blob,token){const r=await fetch("https://api.nft.storage/upload",{method:"POST",headers:{"Authorization":"Bearer "+token},body:blob}); const j=await r.json(); if(!j.ok) throw new Error("NFT.Storage failed"); return "ipfs://"+j.value.cid;}
+function pumpxSVG(){const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='1024' height='1024' viewBox='0 0 1024 1024'><rect width='1024' height='1024' fill='#0b0f1a'/><g transform='translate(128,128)'><circle cx='384' cy='384' r='360' fill='none' stroke='#bfc7d6' stroke-width='24'/><path d='M240 200h160c96 0 160 64 160 152s-64 152-160 152H320v120h-80V200z' fill='#3aa0ff'/><path d='M320 336l56 56 92-92 44 44 84-84' fill='none' stroke='#2b74c8' stroke-width='24' stroke-linecap='round' stroke-linejoin='round'/><path d='M260 680v-110l120-120' fill='none' stroke='#2b74c8' stroke-width='22' stroke-linecap='round'/></g></svg>`; return new Blob([svg],{type:"image/svg+xml"});}
 
 /* ===== Dynamic Imports از jsDelivr ===== */
 const importSpl = ()=> import("https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.6/+esm");
@@ -195,22 +196,12 @@ $("createToken").onclick=async ()=>{
   if(!nftKey) return alert("NFT.Storage token لازم است.");
 
   statusEl.textContent="بارگذاری ماژول‌ها…";
-  const spl = await importSpl();
-  const umiBundle = await importUmiBundle();
-  const umiCore = await importUmiCore();
-  const mplTM = await importMplTM();
+  const spl = await importSpl(); const umiBundle = await importUmiBundle(); const umiCore = await importUmiCore(); const mplTM = await importMplTM();
 
   try{
     statusEl.textContent="آپلود آیکون/JSON…";
     const imageUri = await uploadNFTStorage(iconFile?iconFile:pumpxSVG(), nftKey);
-    const meta = {
-      name, symbol,
-      description: story || `Token ${name} via PumpX`,
-      image: imageUri, external_url: "https://pumpx.info",
-      seller_fee_basis_points: 0,
-      attributes: [{trait_type:"created_via",value:"PumpX"},{trait_type:"decimals",value:decimals}],
-      properties: {category:"image", files:[{uri:imageUri,type: iconFile?iconFile.type:"image/svg+xml"}]}
-    };
+    const meta = { name, symbol, description: story || `Token ${name} via PumpX`, image: imageUri, external_url: "https://pumpx.info", seller_fee_basis_points: 0, attributes:[{trait_type:"created_via",value:"PumpX"},{trait_type:"decimals",value:decimals}], properties:{category:"image", files:[{uri:imageUri,type: iconFile?iconFile.type:"image/svg+xml"}]} };
     const uri = await uploadNFTStorage(new Blob([JSON.stringify(meta)],{type:"application/json"}), nftKey);
 
     statusEl.textContent="ساخت Mint…";
@@ -226,18 +217,8 @@ $("createToken").onclick=async ()=>{
 
     statusEl.textContent="ثبت Metadata روی‌چین…";
     const umi=umiBundle.createUmi(RPCS[network][0]);
-    umi.use(umiCore.signerIdentity({
-      publicKey:umiCore.publicKey(wallet),
-      signTransaction:async(tx)=>provider.signTransaction(tx),
-      signAllTransactions:async(txs)=>provider.signAllTransactions(txs)
-    }));
-    await mplTM.createV1(umi,{
-      mint:umiCore.publicKey(mintPk.toBase58()),
-      authority:umiCore.publicKey(wallet),
-      payer:umiCore.publicKey(wallet),
-      updateAuthority:umiCore.publicKey(wallet),
-      name,symbol,uri,sellerFeeBasisPoints:0
-    }).sendAndConfirm(umi);
+    umi.use(umiCore.signerIdentity({ publicKey:umiCore.publicKey(wallet), signTransaction:async(tx)=>provider.signTransaction(tx), signAllTransactions:async(txs)=>provider.signAllTransactions(txs) }));
+    await mplTM.createV1(umi,{ mint:umiCore.publicKey(mintPk.toBase58()),authority:umiCore.publicKey(wallet),payer:umiCore.publicKey(wallet),updateAuthority:umiCore.publicKey(wallet),name,symbol,uri,sellerFeeBasisPoints:0 }).sendAndConfirm(umi);
 
     const txUrl=`https://explorer.solana.com/tx/${sigMint}?cluster=${network==="devnet"?"devnet":""}`;
     const addrUrl=`https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}`;
@@ -247,10 +228,7 @@ $("createToken").onclick=async ()=>{
     statusEl.textContent="آماده ✅";
     $("lock").disabled=false;
     await refreshBalance();
-  }catch(e){
-    statusEl.textContent="خطا: "+(e?.message||e);
-    console.error(e);
-  }
+  }catch(e){ statusEl.textContent="خطا: "+(e?.message||e); console.error(e); }
 };
 
 /* ===== قفل Mint ===== */
@@ -267,14 +245,28 @@ $("lock").onclick=async ()=>{
   }catch(e){ statusEl.textContent="خطا: "+(e?.message||e); }
 };
 
-/* Auto-detect + silent connect */
-window.addEventListener("load", async ()=>{
-  const p=getProvider();
-  $("prov").textContent = p ? "Detected ✅" : "Not found ❌";
-  try{
-    if(p){ const r=await p.connect?.({onlyIfTrusted:true}); if(r?.publicKey){ wallet=r.publicKey.toString(); $("addr").textContent=wallet; $("connect").style.display="none"; $("disconnect").style.display="inline-block"; $("createToken").disabled=false; await refreshBalance(); } }
-  }catch{}
-});
+/* ===== Swap ===== */
+$("setSwap").onclick=()=>{ const m=$("swapMint").value.trim(); if(m) $("jup").src=`https://jup.ag/swap/SOL-${m}`; };
+$("setPXPX").onclick=()=>{$("jup").src="https://jup.ag/swap/SOL-PXPX";};
+
+/* ===== AI (اختیاری) ===== */
+async function aiChat(key,prompt){
+  if(!key){ // fallback آفلاین
+    const seeds=["Nova","Flux","Neon","Astra","Pulse","Quark"];
+    const name=`${seeds[Math.random()*seeds.length|0]} Token`;
+    const symbol=("PX"+(Math.random()*100|0)).slice(0,4).toUpperCase();
+    const story=`${name}: توکنی برای جامعه‌ای پرانرژی.`;
+    return {options:[{name,symbol,story}],warnings:["قول سود ندهید","Mint را قفل کنید"]};
+  }
+  const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"content-type":"application/json","authorization":"Bearer "+key},body:JSON.stringify({model:"gpt-4o-mini",temperature:0.8,messages:[{role:"system",content:"You are PumpX growth assistant. Return concise JSON only."},{role:"user",content:prompt}]})});
+  const j=await r.json(); const txt=j?.choices?.[0]?.message?.content||"{}"; const m=txt.match(/\{[\s\S]*\}/);
+  try{return JSON.parse(m?m[0]:txt);}catch{return {raw:txt};}
+}
+$("aiBrand").onclick=async()=>{ $("aiStatus").textContent="در حال تولید…"; const out=await aiChat($("openai").value.trim(),`Suggest 3 options: {name<=16, symbol=2-4 caps, story 1 sentence}. Theme: ${$("theme").value}. Return {"options":[...]}.`); const o=out?.options?.[0]||out; if(o?.name)$("name").value=o.name; if(o?.symbol)$("symbol").value=o.symbol; if(o?.story)$("story").value=o.story; $("aiStatus").textContent="اعمال شد ✅"; };
+$("aiRisk").onclick=async()=>{ $("aiStatus").textContent="تحلیل…"; const out=await aiChat($("openai").value.trim(),`Analyze risks and trust-boosters for: ${$("desc").value||$("story").value}. Return {"warnings":["..."],"trust_boosters":["..."]}`); $("riskOut").style.display="block"; $("riskOut").innerHTML=`<div><b>هشدارها</b><ul>${(out?.warnings||[]).map(x=>`<li>${x}</li>`).join("")||"<li>—</li>"}</ul></div><div><b>تقویت اعتماد</b><ul>${(out?.trust_boosters||[]).map(x=>`<li>${x}</li>`).join("")||"<li>—</li>"}</ul></div>`; $("aiStatus").textContent="تمام ✅"; };
+
+/* ===== Auto connect ===== */
+window.addEventListener("load",async()=>{ const p=getProvider(); $("prov").textContent=p?"Detected ✅":"Not found ❌"; try{ if(p){const r=await p.connect?.({onlyIfTrusted:true}); if(r?.publicKey){ wallet=r.publicKey.toString(); $("addr").textContent=wallet; $("connect").style.display="none"; $("disconnect").style.display="inline-block"; $("createToken").disabled=false; await refreshBalance(); } } }catch{};});
 </script>
 </body>
 </html>
