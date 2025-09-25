@@ -1,4 +1,125 @@
-f (!wallet) {
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PumpX • Token Creator</title>
+  <style>
+    body {
+      background: #0d1117;
+      color: #fff;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+    }
+    input, select, button, textarea {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #161b22;
+      color: #fff;
+    }
+    button {
+      cursor: pointer;
+      background: #238636;
+      border: none;
+    }
+    button:hover {
+      background: #2ea043;
+    }
+    .card {
+      background: #161b22;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+  </style>
+
+  <!-- ImportMap -->
+  <script type="importmap">
+  {
+    "imports": {
+      "buffer": "https://cdn.jsdelivr.net/npm/buffer@6.0.3/+esm",
+      "process": "https://cdn.jsdelivr.net/npm/process@0.11.10/+esm",
+      "util": "https://cdn.jsdelivr.net/npm/util@0.12.5/+esm",
+      "events": "https://cdn.jsdelivr.net/npm/events@3.3.0/+esm",
+      "stream": "https://cdn.jsdelivr.net/npm/stream-browserify@3.0.0/+esm",
+      "crypto": "https://cdn.jsdelivr.net/npm/crypto-browserify@3.12.0/+esm",
+
+      "bn.js": "https://cdn.jsdelivr.net/npm/bn.js@5.2.1/+esm",
+      "bs58": "https://cdn.jsdelivr.net/npm/bs58@5.0.0/+esm",
+      "@solana/buffer-layout": "https://cdn.jsdelivr.net/npm/@solana/buffer-layout@4.0.1/+esm",
+      "@solana/buffer-layout-utils": "https://cdn.jsdelivr.net/npm/@solana/buffer-layout-utils@1.2.0/+esm",
+      "borsh": "https://cdn.jsdelivr.net/npm/borsh@0.7.0/lib/index.esm.js",
+
+      "@noble/curves/ed25519": "https://cdn.jsdelivr.net/npm/@noble/curves@1.2.0/ed25519.js",
+      "@noble/curves/ed448": "https://cdn.jsdelivr.net/npm/@noble/curves@1.2.0/ed448.js",
+      "@noble/curves/secp256k1": "https://cdn.jsdelivr.net/npm/@noble/curves@1.2.0/secp256k1.js",
+      "@noble/curves/abstract/weierstrass": "https://cdn.jsdelivr.net/npm/@noble/curves@1.2.0/abstract/weierstrass.js",
+      "@noble/hashes/sha512": "https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.2/sha512.js",
+      "@noble/hashes/sha256": "https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.2/sha256.js",
+      "@noble/hashes/utils": "https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.2/utils.js",
+
+      "bigint-buffer": "https://esm.sh/bigint-buffer@1.1.5?target=es2020&bundle",
+      "safe-buffer": "https://cdn.jsdelivr.net/npm/safe-buffer@5.2.1/+esm",
+      "ieee754": "https://cdn.jsdelivr.net/npm/ieee754@1.2.1/+esm"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 PumpX Token Creator</h1>
+    <div class="card">
+      <label>نام توکن</label>
+      <input id="name" placeholder="PumpX Token">
+
+      <label>نماد</label>
+      <input id="symbol" placeholder="PXPX">
+
+      <label>عرضه اولیه</label>
+      <input id="supply" type="number" placeholder="1000000">
+
+      <label>توضیح</label>
+      <textarea id="desc" placeholder="توضیحی کوتاه"></textarea>
+
+      <button id="connect">اتصال کیف پول</button>
+      <button id="create">ایجاد توکن</button>
+    </div>
+    <div id="status"></div>
+  </div>
+
+  <script type="module">
+    import { Connection, clusterApiUrl } from "https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/+esm";
+
+    const status = document.getElementById("status");
+    const btnConnect = document.getElementById("connect");
+    const btnCreate = document.getElementById("create");
+
+    let wallet = null;
+
+    btnConnect.onclick = async () => {
+      try {
+        if (window.solana && window.solana.isPhantom) {
+          const resp = await window.solana.connect();
+          wallet = resp.publicKey.toString();
+          status.innerHTML = "✅ کیف پول متصل شد: " + wallet;
+        } else {
+          status.innerHTML = "❌ افزونه Phantom نصب نیست";
+        }
+      } catch (err) {
+        status.innerHTML = "⚠️ خطا در اتصال: " + err.message;
+      }
+    };
+
+    btnCreate.onclick = async () => {
+      if (!wallet) {
         status.innerHTML = "⛔ اول کیف پول را متصل کنید.";
         return;
       }
