@@ -3,316 +3,452 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PumpX - پلتفرم پیشرفته توکن‌های سولانا</title>
+    <title>PumpX - طراحی برندینگ اختصاصی</title>
     <style>
+        :root {
+            --primary-purple: #6C3EF0;
+            --primary-blue: #3E8BF0;
+            --accent-green: #00FF88;
+            --accent-pink: #FF3E9D;
+            --dark-bg: #0A0A1A;
+            --card-bg: #15152B;
+            --text-light: #FFFFFF;
+            --text-gray: #A0A0C0;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            line-height: 1.6;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.8;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
         
-        /* هدر و ناوبری */
-        header {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 1rem 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #00ff88;
-        }
-        
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: #00ff88;
-        }
-        
-        .connect-wallet {
-            background: #00ff88;
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.3s;
-        }
-        
-        .connect-wallet:hover {
-            transform: scale(1.05);
-        }
-        
-        /* بخش هیرو */
-        .hero {
+        /* هدر جدید */
+        .brand-header {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-blue));
+            padding: 2rem 0;
             text-align: center;
-            padding: 150px 0 100px;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 3rem;
         }
         
-        .hero h1 {
-            font-size: 3.5rem;
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
             margin-bottom: 1rem;
-            background: linear-gradient(45deg, #00ff88, #00ccff);
+        }
+        
+        .logo-main {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--accent-green), var(--accent-pink));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo-text {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--text-light), var(--accent-green));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
+        .tagline {
+            font-size: 1.3rem;
             opacity: 0.9;
+            margin-top: 0.5rem;
         }
         
-        /* بخش‌های اصلی */
-        .section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .section-title {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            color: #00ff88;
-            text-align: center;
-        }
-        
-        .features-grid {
+        /* پالت رنگی */
+        .color-palette {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
         }
         
-        .feature-card {
-            background: rgba(0, 0, 0, 0.3);
+        .color-card {
             padding: 1.5rem;
             border-radius: 15px;
             text-align: center;
             transition: transform 0.3s;
         }
         
-        .feature-card:hover {
+        .color-card:hover {
             transform: translateY(-5px);
         }
         
-        .feature-icon {
+        .color-swatch {
+            width: 100%;
+            height: 100px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* تایپوگرافی */
+        .typography-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            margin: 2rem 0;
+        }
+        
+        .font-sample {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-right: 4px solid var(--accent-green);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .font-heading {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+        
+        .font-subheading {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .font-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        /* لوگو واریانت‌ها */
+        .logo-variants {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .logo-variant {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo-dark {
+            background: var(--dark-bg);
+            padding: 2rem;
+            border-radius: 10px;
+        }
+        
+        .logo-light {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            color: var(--dark-bg);
+        }
+        
+        /* المان‌های برند */
+        .brand-elements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .element-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .icon-sample {
             font-size: 3rem;
             margin-bottom: 1rem;
-            color: #00ff88;
         }
         
-        /* دکمه‌ها */
-        .btn {
+        .btn-brand {
             display: inline-block;
             padding: 12px 30px;
-            background: linear-gradient(45deg, #00ff88, #00ccff);
-            color: black;
+            background: linear-gradient(45deg, var(--primary-purple), var(--primary-blue));
+            color: white;
             text-decoration: none;
-            border-radius: 25px;
+            border-radius: 50px;
             font-weight: bold;
             margin: 10px;
-            transition: transform 0.3s;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         
-        .btn:hover {
+        .btn-brand:hover {
             transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(108, 62, 240, 0.4);
         }
         
-        /* فوتر */
-        footer {
-            text-align: center;
-            padding: 2rem 0;
-            margin-top: 3rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary-purple);
         }
         
-        .social-links {
+        .btn-accent {
+            background: linear-gradient(45deg, var(--accent-green), var(--accent-pink));
+        }
+        
+        /* نمونه رابط کاربری */
+        .ui-preview {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            margin: 3rem 0;
+        }
+        
+        .ui-window {
+            background: var(--dark-bg);
+            border-radius: 15px;
+            padding: 2rem;
             margin: 1rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .social-links a {
-            color: white;
-            margin: 0 10px;
-            font-size: 1.5rem;
-            text-decoration: none;
+        .nav-preview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-preview {
+            background: linear-gradient(135deg, rgba(108, 62, 240, 0.2), rgba(62, 139, 240, 0.2));
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            border: 1px solid rgba(108, 62, 240, 0.3);
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container nav-container">
-            <div class="logo">PumpX</div>
-            <ul class="nav-links">
-                <li><a href="#create">ساخت توکن</a></li>
-                <li><a href="#trade">ترید هوشمند</a></li>
-                <li><a href="#ai">هوش مصنوعی</a></li>
-                <li><a href="#token">توکن PUMPX</a></li>
-                <li><a href="#support">پشتیبانی AI</a></li>
-            </ul>
-            <button class="connect-wallet">اتصال کیف پول</button>
-        </div>
-    </header>
-
     <div class="container">
-        <section class="hero">
-            <h1>PumpX - انقلاب بعدی در دنیای توکن‌ها</h1>
-            <p>پلتفرم پیشرفته ساخت و مدیریت توکن‌های سولانا با قدرت هوش مصنوعی 90%</p>
-            <div>
-                <a href="#create" class="btn">شروع کنید</a>
-                <a href="#demo" class="btn">دموی زنده</a>
+        <!-- هدر برند -->
+        <header class="brand-header">
+            <div class="logo-container">
+                <div class="logo-main">PX</div>
+                <div class="logo-text">PumpX</div>
+            </div>
+            <p class="tagline">انقلاب در دنیای توکن‌های سولانا با قدرت هوش مصنوعی</p>
+        </header>
+
+        <!-- پالت رنگی -->
+        <section>
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">🎨 پالت رنگی برند</h2>
+            <div class="color-palette">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: var(--primary-purple);"></div>
+                    <h3>بنفش اصلی</h3>
+                    <p>#6C3EF0</p>
+                    <p>برای لوگو و المان‌های اصلی</p>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: var(--primary-blue);"></div>
+                    <h3>آبی اصلی</h3>
+                    <p>#3E8BF0</p>
+                    <p>برای پس‌زمینه و گرادینت‌ها</p>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: var(--accent-green);"></div>
+                    <h3>سبز اکسانت</h3>
+                    <p>#00FF88</p>
+                    <p>برای دکمه‌ها و وضعیت مثبت</p>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: var(--accent-pink);"></div>
+                    <h3>صورتی اکسانت</h3>
+                    <p>#FF3E9D</p>
+                    <p>برای هایلایت و اقدامات خاص</p>
+                </div>
             </div>
         </section>
 
-        <section id="create" class="section">
-            <h2 class="section-title">ساخت توکن در ۳۰ ثانیه</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>سریع و آسان</h3>
-                    <p>با چند کلیک توکن خود را روی سولانا ایجاد کنید</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3>مدیریت هوشمند</h3>
-                    <p>هوش مصنوعی پیشرفته برای مدیریت خودکار</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🛡️</div>
-                    <h3>امنیت تضمینی</h3>
-                    <p>حفاظت پیشرفته در برابر اسکم و کلاهبرداری</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="ai-platform" class="section">
-            <h2 class="section-title">پلتفرم هوش مصنوعی پیشرفته</h2>
-            <div style="text-align: center; margin: 2rem 0;">
-                <div style="font-size: 4rem; margin-bottom: 1rem;">🧠</div>
-                <h3>هوش مصنوعی 90% مدیریت خودکار</h3>
-                <p>سیستم AI ما تمام جنبه‌های پلتفرم را مدیریت می‌کند</p>
+        <!-- تایپوگرافی -->
+        <section class="typography-section">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">🔤 تایپوگرافی برند</h2>
+            
+            <div class="font-sample">
+                <div class="font-heading">فونت Vazirmatn - عنوان اصلی</div>
+                <p>وزن: 900 - سایز: 2.5rem</p>
             </div>
             
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h4>ترید هوشمند</h4>
-                    <p>AI تریدر با دقت 90%+</p>
+            <div class="font-sample">
+                <div class="font-subheading">فونت Vazirmatn - زیرعنوان</div>
+                <p>وزن: 700 - سایز: 1.8rem</p>
+            </div>
+            
+            <div class="font-sample">
+                <div class="font-body">فونت Vazirmatn - متن بدنه</div>
+                <p>وزن: 400 - سایز: 1.1rem - خطوط: 1.8</p>
+                <p>این فونت برای زبان فارسی بهینه شده و خوانایی عالی دارد. برای متون انگلیسی از Segoe UI استفاده می‌شود.</p>
+            </div>
+        </section>
+
+        <!-- واریانت‌های لوگو -->
+        <section>
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">⚡ واریانت‌های لوگو</h2>
+            <div class="logo-variants">
+                <div class="logo-variant">
+                    <h3>لوگو اصلی</h3>
+                    <div class="logo-dark">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="logo-main">PX</div>
+                            <div class="logo-text">PumpX</div>
+                        </div>
+                    </div>
+                    <p>استفاده در پس‌زمینه تیره</p>
                 </div>
-                <div class="feature-card">
-                    <h4>پشتیبانی خودکار</h4>
-                    <p>چت‌بات هوشمند 24/7</p>
+                
+                <div class="logo-variant">
+                    <h3>لوگو روشن</h3>
+                    <div class="logo-light">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 60px; height: 60px; background: linear-gradient(45deg, var(--primary-purple), var(--primary-blue)); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: white;">PX</div>
+                            <div style="font-size: 2.5rem; font-weight: 900; color: var(--dark-bg);">PumpX</div>
+                        </div>
+                    </div>
+                    <p>استفاده در پس‌زمینه روشن</p>
                 </div>
-                <div class="feature-card">
-                    <h4>تحلیل بازار</h4>
-                    <p>پیش‌بینی روندها با AI</p>
+                
+                <div class="logo-variant">
+                    <h3>آیکون تنها</h3>
+                    <div style="display: flex; justify-content: center; gap: 2rem;">
+                        <div class="logo-main">PX</div>
+                        <div style="width: 60px; height: 60px; background: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">P</div>
+                    </div>
+                    <p>برای فاوآیکون و موارد خاص</p>
                 </div>
             </div>
         </section>
 
-        <section id="token" class="section">
-            <h2 class="section-title">توکن PUMPX</h2>
-            <div style="text-align: center;">
-                <p>توکن بومی پلتفرم با امکانات ویژه برای دارندگان</p>
-                <div style="margin: 2rem 0;">
-                    <span class="btn">خرید PUMPX</span>
-                    <span class="btn">استیکینگ</span>
+        <!-- المان‌های برند -->
+        <section>
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">✨ المان‌های برند</h2>
+            <div class="brand-elements">
+                <div class="element-card">
+                    <div class="icon-sample">🎯</div>
+                    <h3>آیکون‌گرافی</h3>
+                    <p>استایل مدرن و فلت با سایه‌های مینیمال</p>
+                    <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; font-size: 2rem;">
+                        <span>⚡</span><span>🚀</span><span>🔒</span><span>🤖</span>
+                    </div>
+                </div>
+                
+                <div class="element-card">
+                    <div class="icon-sample">🎨</div>
+                    <h3>دکمه‌ها و فرم‌ها</h3>
+                    <p>گرادینت‌های روان و انیمیشن‌های ظریف</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn-brand">دکمه اصلی</button>
+                        <button class="btn-brand btn-secondary">ثانویه</button>
+                        <button class="btn-brand btn-accent">آکسانت</button>
+                    </div>
+                </div>
+                
+                <div class="element-card">
+                    <div class="icon-sample">📐</div>
+                    <h3>فضا و فاصله‌ها</h3>
+                    <p>حاشیه‌های 15px - فاصله‌های 1.5rem</p>
+                    <p>شعاع گوشه: 15px برای کارت‌ها</p>
                 </div>
             </div>
         </section>
 
-        <section id="wallets" class="section">
-            <h2 class="section-title">اتصال کیف پول‌ها</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h4>Phantom</h4>
-                    <p>اتصال مستقیم و امن</p>
+        <!-- نمونه رابط کاربری -->
+        <section class="ui-preview">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">📱 پیش‌نمایش رابط کاربری</h2>
+            
+            <div class="ui-window">
+                <div class="nav-preview">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="logo-main" style="width: 40px; height: 40px; font-size: 1.2rem;">PX</div>
+                        <span style="font-weight: bold;">PumpX</span>
+                    </div>
+                    <div>
+                        <button class="btn-brand" style="padding: 8px 20px; font-size: 0.9rem;">اتصال کیف پول</button>
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <h4>Solflare</h4>
-                    <p>پشتیبانی کامل</p>
+                
+                <div class="card-preview">
+                    <h3>ساخت توکن جدید</h3>
+                    <p>توکن خود را در 30 ثانیه ایجاد کنید</p>
+                    <button class="btn-brand btn-accent" style="margin-top: 1rem;">شروع کنید</button>
                 </div>
-                <div class="feature-card">
-                    <h4>Wallet های دیگر</h4>
-                    <p>پشتیبانی از تمام والت‌های سولانا</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div class="card-preview">
+                        <h4>💰 موجودی</h4>
+                        <p>1,250 PUMPX</p>
+                    </div>
+                    <div class="card-preview">
+                        <h4>📈 ارزش</h4>
+                        <p>4,320 USD</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- راهنمای نهایی -->
+        <section style="text-align: center; margin: 4rem 0; padding: 2rem; background: var(--card-bg); border-radius: 20px;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">✅ برندینگ PumpX آماده است!</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">این طراحی برندینگ حرفه‌ای برای پلتفرم PumpX ایجاد شده است.</p>
+            
+            <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                <div>
+                    <h4>🎯 اهداف برند</h4>
+                    <p>مدرن، پیشرفته، قابل اعتماد</p>
+                </div>
+                <div>
+                    <h4>💡 شخصیت برند</h4>
+                    <p>تکنولوژی محور، آینده نگر</p>
+                </div>
+                <div>
+                    <h4>🚀 ارزش‌ها</h4>
+                    <p>امنیت، سادگی، قدرت</p>
                 </div>
             </div>
         </section>
     </div>
 
-    <footer>
-        <div class="container">
-            <div class="logo">PumpX.info</div>
-            <p>پلتفرم پیشرفته توکن‌های سولانا با قدرت هوش مصنوعی</p>
-            <div class="social-links">
-                <a href="#">✉️ ایمیل</a>
-                <a href="#">🐦 شبکه X</a>
-                <a href="#">💬 تلگرام</a>
-            </div>
-            <p>© 2024 PumpX. تمام حقوق محفوظ است.</p>
-        </div>
-    </footer>
-
     <script>
-        // اسکریپت پایه برای نمایش پیام‌ها
-        document.querySelector('.connect-wallet').addEventListener('click', function() {
-            alert('اتصال کیف پول - این قابلیت در نسخه کامل فعال خواهد شد\n\nSupported Wallets: Phantom, Solflare, etc.');
+        // اسکریپت برای نمایش پویای برندینگ
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('PumpX Branding Guidelines Loaded');
+            console.log('Primary Colors: #6C3EF0, #3E8BF0');
+            console.log('Accent Colors: #00FF88, #FF3E9D');
+            console.log('Font: Vazirmatn (Persian), Segoe UI (English)');
         });
-        
-        // نمایش پیام برای دکمه‌ها
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                if(this.textContent.includes('شروع')) {
-                    alert('بخش ساخت توکن - به زودی فعال می‌شود');
-                    e.preventDefault();
-                }
-                if(this.textContent.includes('خرید')) {
-                    alert('خرید توکن PUMPX - به زودی فعال می‌شود');
-                    e.preventDefault();
-                }
-            });
-        });
-        
-        console.log('PumpX Platform - Under Development');
-        console.log('Domain: pumpx.info');
-        console.log('AI Integration: 90%');
-        console.log('Blockchain: Solana');
     </script>
 </body>
-</html>
+    </html>
