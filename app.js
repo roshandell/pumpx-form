@@ -1,97 +1,84 @@
-import { Connection, clusterApiUrl, PublicKey, Transaction } from "https://esm.sh/@solana/web3.js@1.95.3";
-import {
-  createMint,
-  getOrCreateAssociatedTokenAccount,
-  mintTo,
-  TOKEN_PROGRAM_ID,
-} from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
-
-const $ = (id) => document.getElementById(id);
-const statusEl = $("status");
-const resultEl = $("result");
-let wallet = null;
-let network = "devnet";
-let connection = new Connection(clusterApiUrl(network), "confirmed");
-
-$("network").addEventListener("change", (e) => {
-  network = e.target.value;
-  connection = new Connection(clusterApiUrl(network), "confirmed");
-});
-
-$("connect").addEventListener("click", async () => {
-  try {
-    if (!window.solana || !window.solana.isPhantom) {
-      alert("Phantom نصب نیست. لطفاً Phantom را نصب کنید.");
-      return;
-    }
-    const resp = await window.solana.connect();
-    wallet = new PublicKey(resp.publicKey.toString());
-    $("create").disabled = false;
-    $("connect").textContent = `متصل: ${wallet.toBase58().slice(0,4)}…${wallet.toBase58().slice(-4)}`;
-  } catch (e) {
-    console.error(e);
-    alert("اتصال ناموفق بود");
+// ===== Wallet connect (ساده/دموی)
+const connectBtn = document.getElementById('connectBtn');
+async function connectWallet() {
+  if (window.solana && window.solana.isPhantom) {
+    try {
+      const resp = await window.solana.connect();
+      alert('Phantom: ' + resp.publicKey.toString());
+    } catch(e){ console.error(e); }
+  } else {
+    // اگر Phantom موجود نبود، صفحه نصب باز می‌شود
+    window.open('https://phantom.app/', '_blank');
   }
+}
+if (connectBtn) connectBtn.addEventListener('click', connectWallet);
+
+// ===== AI Suggest (موک؛ بعداً به بک‌اند/LLM وصل می‌کنیم)
+const aiForm   = document.getElementById('aiLaunchForm');
+const aiOutput = document.getElementById('aiOutput');
+const btnAiSuggest = document.getElementById('btnAiSuggest');
+
+function aiSuggest() {
+  const name = document.getElementById('tName').value || 'PumpX AI Token';
+  const sym  = document.getElementById('tSymbol').value || 'PXA';
+  const sup  = document.getElementById('tSupply').value || '1000000000';
+  const liq  = document.getElementById('tLiq').value || '80';
+  const brief= document.getElementById('tBrief').value || 'AI-native utility token';
+
+  const desc = `✅ Proposal
+• Name: ${name}
+• Symbol: ${sym}
+• Total Supply: ${Number(sup).toLocaleString()}
+• Liquidity: ${liq}%
+• Use-case: ${brief}
+• Taxes: buy 0.5% / sell 0.5% (liquidity & ops)
+• Anti-rug: lock LP, renounce mint
+
+Next: review & click "Create Token".`;
+  aiOutput.textContent = desc;
+  aiOutput.classList.remove('hidden');
+}
+if (btnAiSuggest) btnAiSuggest.addEventListener('click', aiSuggest);
+
+if (aiForm) aiForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  alert('Create Token → این بخش بعداً به قرارداد سولانا وصل می‌شود.');
 });
 
-$("create").addEventListener("click", async () => {
-  if (!wallet) return alert("ابتدا به Phantom وصل شوید.");
+// ===== Live Ticker & Trending (داده نمونه)
+const sampleTicker = [
+  {sym:'PXP', price:0.0123, chg:+8.2, liq:120_000},
+  {sym:'AIP', price:0.0031, chg:-2.4, liq:44_000},
+  {sym:'SOL', price:172.35, chg:+1.1, liq:5_400_000},
+  {sym:'MPX', price:0.00052, chg:+21.0, liq:9_100}
+];
+const tickEl = document.getElementById('ticker');
+if (tickEl){
+  tickEl.innerHTML = sampleTicker.map(t=>`
+    <div class="tick">
+      <div class="sym">${t.sym}</div>
+      <div>$${t.price}</div>
+      <div class="chg ${t.chg>=0?'up':'down'}">${t.chg}%</div>
+      <div class="muted">Liq: $${t.liq.toLocaleString()}</div>
+    </div>
+  `).join('');
+}
 
-  const name = $("name").value.trim();
-  const symbol = $("symbol").value.trim();
-  const decimals = parseInt($("decimals").value, 10) || 9;
-  const supplyHuman = Number($("supply").value || "0");
-  if (supplyHuman <= 0) return alert("عرضه اولیه معتبر نیست.");
-
-  setStatus("ساخت Mint جدید...");
-  resultEl.classList.add("hidden");
-  try {
-    // Phantom signer adapter
-    const provider = window.solana;
-    const signer = {
-      publicKey: wallet,
-      signTransaction: async (tx) => provider.signTransaction(tx),
-      signAllTransactions: async (txs) => provider.signAllTransactions(txs),
-    };
-
-    // 1) ایجاد مینت
-    const mintPk = await createMint(
-      connection,
-      signer,
-      wallet, // mintAuthority
-      wallet, // freezeAuthority (می‌تونی null بدهی)
-      decimals,
-      undefined,
-      undefined,
-      TOKEN_PROGRAM_ID
-    );
-
-    // 2) حساب مرتبط کاربر (ATA)
-    setStatus("ساخت حساب توکن...");
-    const ata = await getOrCreateAssociatedTokenAccount(connection, signer, mintPk, wallet);
-
-    // 3) محاسبه مقدار عرضه
-    const amount = BigInt(Math.round(supplyHuman * (10 ** decimals)));
-
-    // 4) مینت به کاربر
-    setStatus("مینت کردن عرضه اولیه...");
-    const sig = await mintTo(connection, signer, mintPk, ata.address, wallet, Number(amount));
-
-    setStatus("انجام شد ✅");
-    resultEl.classList.remove("hidden");
-    const txUrl = `https://explorer.solana.com/tx/${sig}?cluster=${network==="devnet"?"devnet":""}`;
-    const addrUrl = `https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}`;
-    resultEl.innerHTML = `
-      <div>آدرس مینت: <code>${mintPk.toBase58()}</code></div>
-      <div><a href="${addrUrl}" target="_blank">مشاهده Mint در Explorer</a></div>
-      <div><a href="${txUrl}" target="_blank">تراکنش ساخت/مینت</a></div>
-      <div style="opacity:.75;margin-top:8px">نام/نماد UI: ${name} (${symbol}) — برای ثبت دائمی، مرحله‌ی بعد Metadata روی‌چین است.</div>
-    `;
-  } catch (e) {
-    console.error(e);
-    setStatus("خطا در ساخت توکن");
-    alert(e?.message ?? e);
-  }
-});
-
-function setStatus(t){ statusEl.textContent = t; }
+const sampleTrending = [
+  {name:'PumpX', sym:'PXP', price:0.0123, chg:+8.2, liq:120000, holders:2134},
+  {name:'AI Power', sym:'AIP', price:0.0031, chg:-2.4, liq:44000, holders:981},
+  {name:'MetaPix', sym:'MPX', price:0.00052, chg:+21.0, liq:9100, holders:540}
+];
+const tbody = document.querySelector('#trendTable tbody');
+if (tbody){
+  tbody.innerHTML = sampleTrending.map(r=>`
+    <tr>
+      <td><span class="badge">${r.sym}</span> ${r.name}</td>
+      <td>$${r.price}</td>
+      <td style="color:${r.chg>=0?'#18d48a':'#ff6b6b'}">${r.chg}%</td>
+      <td>$${r.liq.toLocaleString()}</td>
+      <td>${r.holders.toLocaleString()}</td>
+      <td><a class="btn secondary" href="#">Trade</a></td>
+    </tr>
+  `).join('');
+}
