@@ -2,126 +2,144 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PumpX — Create, Trade & Scale Tokens with AI</title>
-  <meta name="description" content="PumpX is a Solana-based platform to create, trade, and manage tokens with AI tools." />
-  <link rel="icon" type="image/png" href="assets/favicon.png" />
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: "#FF7E29",
-            secondary: "#6B3CE9",
-            darkbg: "#0E1A2B"
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    .gradient-text {{
-      background: linear-gradient(90deg, #FF7E29 0%, #6B3CE9 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      color: transparent;
-    }}
-    .card {{
-      background: #152238;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 1rem;
-    }}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PumpX • Create, Trade & Scale Tokens with AI</title>
+
+  <!-- Favicon / Social -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/favicon.png">
+  <meta property="og:title" content="PumpX • AI Token Platform">
+  <meta property="og:description" content="Create, Trade & Scale tokens with AI tools on Solana.">
+  <meta property="og:image" content="https://pumpx.info/assets/logo.png">
+  <meta name="theme-color" content="#0b1220" />
+
+  <link rel="stylesheet" href="/style.css" />
 </head>
-<body class="min-h-screen bg-darkbg text-white antialiased">
+<body>
   <!-- Header -->
-  <header class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-    <div class="flex items-center space-x-3">
-      <img src="assets/logo.png" alt="PumpX logo" class="h-8 w-auto" />
-      <span class="text-xl font-bold text-primary">PumpX</span>
+  <header class="header">
+    <div class="container header-grid">
+      <a class="brand" href="/">
+        <img src="/assets/logo.png" alt="PumpX" class="logo">
+      </a>
+      <nav class="nav">
+        <a href="#ai-wizard">AI Wizard</a>
+        <a href="#live">Live</a>
+        <a href="#trending">Trending</a>
+        <a href="#roadmap">Roadmap</a>
+      </nav>
+      <button id="connectBtn" class="btn primary">Connect Wallet</button>
     </div>
-    <nav class="hidden md:flex items-center space-x-8 text-gray-300">
-      <a href="#features" class="hover:text-primary">Features</a>
-      <a href="#market" class="hover:text-primary">Market</a>
-      <a href="#ai" class="hover:text-primary">AI Tools</a>
-      <a href="#contact" class="hover:text-primary">Contact</a>
-    </nav>
-    <a href="#" class="md:inline-flex hidden px-4 py-2 rounded-xl bg-primary hover:opacity-90">Connect Wallet</a>
   </header>
 
   <!-- Hero -->
-  <section class="max-w-7xl mx-auto px-6 pt-10 pb-20 text-center">
-    <h1 class="text-5xl font-extrabold gradient-text">Create, Trade & Scale Tokens with AI</h1>
-    <p class="mt-6 text-lg text-gray-300 max-w-3xl mx-auto">
-      PumpX is the next-gen Solana platform for launching and managing tokens.
-      Powered by AI for smarter trading, tokenomics, and security.
-    </p>
-    <div class="mt-8 flex items-center justify-center space-x-4">
-      <a href="#create" class="px-6 py-3 rounded-2xl bg-primary hover:opacity-90">Launch Token</a>
-      <a href="#market" class="px-6 py-3 rounded-2xl border border-secondary text-secondary hover:bg-secondary/10">Explore Market</a>
-    </div>
-  </section>
-
-  <!-- Features -->
-  <section id="features" class="bg-[#0E1A2B] py-16">
-    <div class="max-w-7xl mx-auto px-6">
-      <h2 class="text-3xl font-bold text-center mb-10">Platform Features</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="card p-6">
-          <h3 class="text-xl font-semibold text-primary mb-2">AI Tokenomics</h3>
-          <p class="text-gray-300">Automatic tokenomics design and analysis with AI-powered insights.</p>
-        </div>
-        <div class="card p-6">
-          <h3 class="text-xl font-semibold text-primary mb-2">Secure Trading</h3>
-          <p class="text-gray-300">On-chain security checks, rug-pull detection, and safe swaps.</p>
-        </div>
-        <div class="card p-6">
-          <h3 class="text-xl font-semibold text-primary mb-2">Live Analytics</h3>
-          <p class="text-gray-300">Real-time charts, liquidity tracking, and whale alerts.</p>
-        </div>
+  <section class="hero">
+    <div class="container">
+      <h1>Create, Trade & Scale Tokens with <span class="grad">AI</span></h1>
+      <p class="muted">PumpX is the next-gen Solana platform to launch and manage tokens with AI tools.</p>
+      <div class="hero-actions">
+        <a href="#ai-wizard" class="btn primary">Start with AI</a>
+        <a href="#trending" class="btn secondary">Explore Market</a>
       </div>
     </div>
   </section>
 
-  <!-- Market Preview -->
-  <section id="market" class="bg-[#111a2b] py-16">
-    <div class="max-w-7xl mx-auto px-6">
-      <h2 class="text-3xl font-bold text-center mb-10">Live Market Preview</h2>
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="card p-6">
-          <h3 class="text-xl font-semibold text-secondary mb-4">Top Tokens</h3>
-          <ul class="space-y-2 text-gray-300">
-            <li class="flex justify-between"><span>PUMPX</span><span>$0.12</span></li>
-            <li class="flex justify-between"><span>AIcoin</span><span>$1.42</span></li>
-            <li class="flex justify-between"><span>GameFiX</span><span>$0.07</span></li>
-          </ul>
-        </div>
-        <div class="card p-6">
-          <h3 class="text-xl font-semibold text-secondary mb-4">Trending Now</h3>
-          <p class="text-gray-300">Live token trends powered by AI detection.</p>
-        </div>
+  <!-- ===== AI Launch Wizard ===== -->
+  <section id="ai-wizard" class="section">
+    <div class="container">
+      <h2 class="h2">Launch a Token with AI</h2>
+      <p class="muted">اسم، نماد، عرضه اولیه، نقدینگی و توضیحات را هوش مصنوعی پیشنهاد می‌دهد.</p>
+      <div class="card">
+        <form id="aiLaunchForm">
+          <div class="grid-2">
+            <div>
+              <label>Token Name</label>
+              <input id="tName" type="text" placeholder="PumpX AI Token">
+            </div>
+            <div>
+              <label>Symbol</label>
+              <input id="tSymbol" type="text" placeholder="PXA">
+            </div>
+            <div>
+              <label>Total Supply</label>
+              <input id="tSupply" type="number" placeholder="1000000000">
+            </div>
+            <div>
+              <label>Liquidity %</label>
+              <input id="tLiq" type="number" placeholder="80">
+            </div>
+          </div>
+          <label>Project Brief (اختیاری)</label>
+          <textarea id="tBrief" rows="3" placeholder="ایده‌ی توکن را بنویس..."></textarea>
+
+          <div class="actions">
+            <button type="button" id="btnAiSuggest" class="btn secondary">AI Suggest</button>
+            <button type="submit" class="btn primary">Create Token</button>
+          </div>
+        </form>
+        <div id="aiOutput" class="ai-output hidden"></div>
       </div>
     </div>
   </section>
 
-  <!-- AI Tools -->
-  <section id="ai" class="bg-[#0E1A2B] py-16">
-    <div class="max-w-7xl mx-auto px-6">
-      <h2 class="text-3xl font-bold text-center mb-10">AI Tools for Every Trader</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="card p-6 text-center"><h3 class="text-xl font-semibold text-primary">AI Token Creator</h3></div>
-        <div class="card p-6 text-center"><h3 class="text-xl font-semibold text-primary">Rug-Pull Detector</h3></div>
-        <div class="card p-6 text-center"><h3 class="text-xl font-semibold text-primary">Smart Liquidity Manager</h3></div>
+  <!-- ===== Live Market Ticker ===== -->
+  <section id="live" class="section alt">
+    <div class="container">
+      <h2 class="h2">Live Market</h2>
+      <div id="ticker" class="ticker"></div>
+    </div>
+  </section>
+
+  <!-- ===== Trending Tokens Table ===== -->
+  <section id="trending" class="section">
+    <div class="container">
+      <h2 class="h2">Trending on PumpX</h2>
+      <div class="table-wrap">
+        <table id="trendTable">
+          <thead>
+            <tr>
+              <th>Token</th><th>Price</th><th>24h</th><th>Liquidity</th><th>Holders</th><th></th>
+            </tr>
+          </thead>
+          <tbody><!-- filled by JS --></tbody>
+        </table>
       </div>
+    </div>
+  </section>
+
+  <!-- ===== Roadmap & FAQ ===== -->
+  <section id="roadmap" class="section alt">
+    <div class="container">
+      <h2 class="h2">Roadmap</h2>
+      <div class="road">
+        <div><span>Q4 2025</span><p>AI Wizard v1، تیکر زنده، اتصال Phantom/Solflare.</p></div>
+        <div><span>Q1 2026</span><p>مارکت‌میکر خودکار + پنل تحلیل زنده.</p></div>
+        <div><span>Q2 2026</span><p>لانچ توکن پلتفرم PXP و استیکینگ.</p></div>
+      </div>
+
+      <h3 class="h3 mt32">FAQ</h3>
+      <details><summary>چطور کیف‌پول متصل کنم؟</summary><p>روی Connect Wallet بزنید؛ اگر Phantom یا Solflare نصب باشد شناسایی می‌شود.</p></details>
+      <details><summary>هزینه ساخت توکن؟</summary><p>فقط کارمزد شبکه سولانا + کمیسیون ناچیز پلتفرم (قابل تنظیم).</p></details>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer id="contact" class="border-t border-white/10 py-10 text-center text-gray-400">
-    <p>© 2025 PumpX — pumpx.info | Contact: <a href="mailto:support@pumpx.info" class="underline">support@pumpx.info</a></p>
+  <footer class="footer">
+    <div class="container foot-grid">
+      <div>
+        <img src="/assets/logo.png" alt="PumpX" class="logo-sm">
+        <p class="muted">Create, Trade & Scale tokens with AI.</p>
+      </div>
+      <nav>
+        <a href="#ai-wizard">AI Wizard</a>
+        <a href="#live">Live</a>
+        <a href="#trending">Trending</a>
+        <a href="#roadmap">Roadmap</a>
+      </nav>
+      <div class="muted">© PumpX 2025 • pumpx.info</div>
+    </div>
   </footer>
+
+  <script src="/app.js"></script>
 </body>
 </html>
