@@ -3,228 +3,365 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Solana Wallet Test – Phantom & Solflare (Final+Debug)</title>
+<title>PumpX — AI Token Launcher (PXPX Ready)</title>
 <link rel="preconnect" href="https://esm.sh"/>
 <style>
-  :root{--bg:#0b0f1a;--card:#0f1524;--line:#334466}
+  :root{--bg:#0b0f1a;--card:#0f1524;--line:#334466;--accent:#79d9ff}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:#fff;font-family:Inter,system-ui,"Noto Sans Arabic",sans-serif}
-  .wrap{max-width:820px;margin:auto;padding:22px}
-  .card{background:#0f1524;border:1px solid #ffffff22;border-radius:16px;padding:16px;margin:12px 0}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .btn{background:#1b2744;border:1px solid #445; color:#fff;border-radius:10px;padding:10px 12px;cursor:pointer}
+  a{color:var(--accent);text-decoration:none}
+  .wrap{max-width:1200px;margin:auto;padding:20px}
+  .nav{position:sticky;top:0;z-index:40;background:#0b0f1acc;border-bottom:1px solid #ffffff22;backdrop-filter:blur(8px)}
+  .navin{display:flex;gap:10px;justify-content:space-between;align-items:center;height:64px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{padding:10px 14px;border-radius:12px;border:1px solid #ffffff22;background:#121a2c;cursor:pointer}
+  .tab.active{background:#1b2744}
+  .btn{background:linear-gradient(90deg,#12f0ff44,#7a5cff33,#ff3ef633);border:1px solid #ffffff22;padding:10px 14px;border-radius:12px;color:#fff;cursor:pointer}
   .btn:disabled{opacity:.5;cursor:not-allowed}
-  select,input{background:#121a2c;border:1px solid #445;color:#fff;border-radius:10px;padding:8px 10px}
-  .code{background:#0b0f1a;border:1px solid #445;border-radius:10px;padding:8px 10px;word-break:break-all}
+  .select,.input,.textarea{background:#121a2c;border:1px solid var(--line);color:#fff;border-radius:12px;padding:10px 12px}
+  .textarea{min-height:90px;resize:vertical}
+  .card{background:#0f1524;border:1px solid #ffffff22;border-radius:18px;padding:16px;margin:14px 0}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .muted{opacity:.8;font-size:13px}
-  a{color:#79d9ff}
+  .code{background:#0b0f1a;border:1px solid #445;border-radius:10px;padding:8px 10px;word-break:break-all}
+  .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .kpi{background:#0f1524;border:1px solid #ffffff22;border-radius:16px;padding:12px}
+  .badge{display:inline-block;padding:4px 8px;border:1px solid #ffffff22;border-radius:999px;background:#ffffff10;font-size:12px;margin-inline-start:6px}
+  .list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  @media(max-width:1000px){.list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:720px){.list{grid-template-columns:1fr}}
+  .card-sm{background:#10172a;border:1px solid #ffffff22;border-radius:14px;padding:12px}
+  footer{margin:40px 0;opacity:.7;font-size:13px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1 style="margin:6px 0">تست کیف پول سولانا — Phantom / Solflare</h1>
-
-  <!-- شبکه + RPC -->
-  <div class="card">
+<div class="nav">
+  <div class="wrap navin">
     <div class="row">
-      <label>شبکه:
-        <select id="network">
-          <option value="devnet" selected>Devnet</option>
-          <option value="mainnet-beta">Mainnet</option>
-        </select>
-      </label>
-      <label style="flex:1 1 360px">RPC Mainnet اختصاصی
-        <input id="rpcMain" style="width:100%" placeholder="https://rpc.helius.xyz/?api-key=YOUR_KEY"/>
-      </label>
-      <span id="https" class="muted">HTTPS: —</span>
+      <div style="font-weight:900;letter-spacing:.12em">PumpX</div>
+      <span class="badge">Pro</span>
     </div>
-    <div class="muted" style="margin-top:6px">
-      برای Mainnet حتماً یک RPC اختصاصی (Helius/Alchemy/QuickNode/…) وارد کن تا خطای rate limit نگیری.
-    </div>
-  </div>
-
-  <!-- اتصال -->
-  <div class="card">
-    <h3>اتصال</h3>
     <div class="row">
-      <button id="connect-phantom" class="btn">اتصال Phantom</button>
-      <button id="connect-solflare" class="btn">اتصال Solflare</button>
-      <button id="disconnect" class="btn" disabled>قطع اتصال</button>
-      <span id="status" class="muted"></span>
-    </div>
-  </div>
-
-  <!-- وضعیت -->
-  <div class="card">
-    <h3>وضعیت</h3>
-    <div class="row"><span class="muted">Provider:</span> <span id="prov" class="code">—</span></div>
-    <div class="row"><span class="muted">آدرس:</span> <span id="addr" class="code">—</span></div>
-    <div class="row"><span class="muted">موجودی SOL:</span> <span id="bal" class="code">—</span></div>
-    <div class="row"><span class="muted">RPC فعال:</span> <span id="rpcUsing" class="code">—</span></div>
-    <div class="row"><span class="muted">خطای آخر:</span> <span id="lastErr" class="code">—</span></div>
-    <div class="muted" style="margin-top:8px">
-      Devnet: از <a href="https://faucet.solana.com" target="_blank">فاست سولانا</a> SOL بگیر.  
-      اگر موجودی «خطا» شد، شبکهٔ کیف را با انتخاب بالا یکی کن؛ برای Mainnet یک RPC اختصاصی بده.
+      <select id="network" class="select">
+        <option value="devnet" selected>Devnet</option>
+        <option value="mainnet-beta">Mainnet</option>
+      </select>
+      <button id="connect" class="btn">اتصال کیف</button>
+      <button id="disconnect" class="btn" style="display:none">قطع</button>
     </div>
   </div>
 </div>
 
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-page="create">ساخت توکن</div>
+    <div class="tab" data-page="explore">در حال رشد</div>
+    <div class="tab" data-page="swap">خرید/فروش</div>
+    <div class="tab" data-page="ai">دستیار AI</div>
+    <div class="tab" data-page="support">پشتیبانی</div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="muted">Provider</div><div id="prov" class="code">—</div></div>
+    <div class="kpi"><div class="muted">آدرس</div><div id="addr" class="code">—</div></div>
+    <div class="kpi"><div class="muted">موجودی SOL</div><div id="bal" class="code">—</div></div>
+    <div class="kpi"><div class="muted">RPC فعال</div><div id="rpcUsing" class="code">—</div></div>
+  </div>
+
+  <!-- CREATE -->
+  <section id="page-create" class="card">
+    <h2 style="margin:0 0 10px">ساخت توکن (SPL) + متادیتا (IPFS)</h2>
+    <div class="row" style="gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <button id="pxpx" class="btn">🚀 Launch PumpX (PXPX)</button>
+      <span class="muted">با این دکمه، لوگوی PumpX و JSON به‌صورت خودکار آپلود می‌شود و توکن PXPX ساخته می‌شود.</span>
+    </div>
+
+    <div class="grid">
+      <label>نام<input id="name" class="input" value="PumpX Token"></label>
+      <label>نماد<input id="symbol" class="input" value="PXPX"></label>
+      <label>Decimals<input id="decimals" class="input" type="number" min="0" max="9" value="9"></label>
+      <label>عرضه اولیه (واحد انسانی)<input id="supply" class="input" type="number" value="1000000000"></label>
+      <label>آیکون (PNG/SVG/JPG)<input id="icon" class="input" type="file" accept=".png,.svg,.jpg,.jpeg"/></label>
+      <label>NFT.Storage Token<input id="nftkey" class="input" placeholder="برای IPFS/متادیتا"/></label>
+      <label style="grid-column:1/-1">توضیح/Story (اختیاری)<textarea id="story" class="textarea"></textarea></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="createToken" class="btn" disabled>🪙 ساخت توکن</button>
+      <button id="lock" class="btn" disabled>🔒 قفل Mint Authority</button>
+      <span id="status" class="muted"></span>
+    </div>
+    <div id="result" class="card" style="display:none;margin-top:12px"></div>
+  </section>
+
+  <!-- EXPLORE -->
+  <section id="page-explore" class="card" style="display:none">
+    <h2 style="margin:0 0 10px">توکن‌های در حال رشد (محلی)</h2>
+    <div class="row">
+      <button id="refreshLocal" class="btn">🔄 رفرش</button>
+      <span class="muted">رجیستری جهانی در مرحله‌ی بعد با Supabase/Helius Indexer.</span>
+    </div>
+    <div id="explist" class="list" style="margin-top:12px"></div>
+  </section>
+
+  <!-- SWAP -->
+  <section id="page-swap" class="card" style="display:none">
+    <h2 style="margin:0 0 10px">خرید/فروش — Jupiter</h2>
+    <div id="swapBox" class="card-sm" style="height:620px">
+      <iframe id="jup" src="https://jup.ag/swap/SOL" style="width:100%;height:600px;border:0;border-radius:12px;background:#0b0f1a"></iframe>
+    </div>
+    <div class="row">
+      <label style="flex:1">آدرس توکن شما
+        <input id="swapMint" class="input" placeholder="Mint address"/>
+      </label>
+      <button id="setSwap" class="btn">تنظیم جفت SOL ↔︎ Token</button>
+      <button id="setPXPX" class="btn">SOL ↔︎ PXPX</button>
+    </div>
+  </section>
+
+  <!-- AI -->
+  <section id="page-ai" class="card" style="display:none">
+    <h2 style="margin:0 0 10px">دستیار هوش مصنوعی</h2>
+    <div class="grid">
+      <label>OpenAI API Key (اختیاری)<input id="openai" class="input" placeholder="sk-..."/></label>
+      <label>تم/کلیدواژه‌ها<input id="theme" class="input" value="میم، جهانی، نئونی"/></label>
+      <label style="grid-column:1/-1">متن توضیحات/رودمپ
+        <textarea id="desc" class="textarea"></textarea>
+      </label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="aiBrand" class="btn">پیشنهاد نام/نماد/Story</button>
+      <button id="aiRisk" class="btn">تحلیل ریسک/اعتماد</button>
+      <span id="aiStatus" class="muted"></span>
+    </div>
+    <div id="riskOut" class="card-sm" style="display:none;margin-top:10px"></div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section id="page-support" class="card" style="display:none">
+    <h2 style="margin:0 0 10px">پشتیبانی</h2>
+    <p>ایمیل: <a href="mailto:support@pumpx.info">support@pumpx.info</a></p>
+    <p class="muted">ساعات پاسخ‌گویی آزمایشی: ۲۰ ساعت. سلب مسئولیت: PumpX بستری فنی است و قول سود نمی‌دهد.</p>
+  </section>
+
+  <footer>© <span id="year"></span> PumpX — Create • Launch • Grow</footer>
+</div>
+
 <script type="module">
+/* ---------- Imports ---------- */
 import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
+import { createMint, getOrCreateAssociatedTokenAccount, mintTo, setAuthority, AuthorityType, TOKEN_PROGRAM_ID } from "https://esm.sh/@solana/spl-token@0.4.6?bundle";
+import { createUmi } from "https://esm.sh/@metaplex-foundation/umi-bundle-defaults@0.8.10";
+import { publicKey as umiPk, signerIdentity } from "https://esm.sh/@metaplex-foundation/umi@0.8.10";
+import { createV1 } from "https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.1.2";
 
-const $ = id => document.getElementById(id);
-const netSel = $("network"), rpcMain = $("rpcMain");
-const btnPhantom = $("connect-phantom"), btnSolflare = $("connect-solflare"), btnDisconnect = $("disconnect");
-const statusEl = $("status"), provEl = $("prov"), addrEl = $("addr"), balEl = $("bal");
-const rpcUsingEl = $("rpcUsing"), lastErrEl = $("lastErr");
-$("https").textContent = location.protocol.startsWith("https") ? "HTTPS: بله ✅" : "HTTPS: خیر ❌";
+/* ---------- Helpers & UI ---------- */
+const $=id=>document.getElementById(id); $("year").textContent=new Date().getFullYear();
+document.querySelectorAll(".tab").forEach(t=>{t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");const pg=t.dataset.page;document.querySelectorAll("section[id^='page-']").forEach(s=>s.style.display="none");$("page-"+pg).style.display="block";};});
+const provEl=$("prov"),addrEl=$("addr"),balEl=$("bal"),rpcUsingEl=$("rpcUsing"),statusEl=$("status");
 
-let provider = null;
-let walletPubkey = null;
-let network = "devnet";
+/* ---------- Hidden RPC (your Helius) ---------- */
+const HELIUS_MAINNET_URL="https://mainnet.helius-rpc.com/?api-key=b553d42b-55cd-48ca-bf99-e81ff18ef4d6";
+const RPCS={ "devnet":[clusterApiUrl("devnet"),"https://api.devnet.solana.com"], "mainnet-beta":[HELIUS_MAINNET_URL,clusterApiUrl("mainnet-beta"),"https://api.mainnet-beta.solana.com"] };
+let network="devnet"; let connection=new Connection(RPCS[network][0],"confirmed"); rpcUsingEl.textContent=RPCS[network][0];
 
-/* ---------- RPC ها ---------- */
-const DEFAULT_RPCS = {
-  "devnet": [
-    clusterApiUrl("devnet"),
-    "https://api.devnet.solana.com",
-    "https://devnet.rpcpool.com"
-  ],
-  "mainnet-beta": [
-    clusterApiUrl("mainnet-beta"),
-    "https://api.mainnet-beta.solana.com",
-    "https://rpc.ankr.com/solana"
-  ]
-};
-function getRPCs(net){
-  const custom = (net==="mainnet-beta" && rpcMain.value.trim())
-    ? [rpcMain.value.trim()]
-    : [];
-  return [...custom, ...(DEFAULT_RPCS[net]||[])];
-}
-let connection = new Connection(getRPCs(network)[0], "confirmed");
+/* ---------- Wallet ---------- */
+let provider=null, wallet=null;
+function getProvider(){const w=window; if(w?.phantom?.solana?.isPhantom) return w.phantom.solana; if(w?.solana?.isPhantom) return w.solana; if(w?.solflare) return w.solflare; if(w?.solana?.isSolflare) return w.solana; return null;}
+$("network").onchange=async e=>{network=e.target.value; connection=new Connection(RPCS[network][0],"confirmed"); rpcUsingEl.textContent=RPCS[network][0]; await refreshBalance();};
+$("connect").onclick=async()=>{provider=getProvider(); provEl.textContent=provider?"OK ✅":"Not found ❌"; if(!provider) return alert("Phantom یا Solflare نصب/باز شود."); try{const r=await(provider.connect?provider.connect():provider.request({method:"connect"})); wallet=r?.publicKey?.toString?.()||provider.publicKey?.toString?.(); addrEl.textContent=wallet||"—"; $("connect").style.display="none"; $("disconnect").style.display="inline-block"; $("createToken").disabled=false; await refreshBalance(); }catch(e){statusEl.textContent=e?.message||e;}};
+$("disconnect").onclick=async()=>{try{await provider?.disconnect?.();}catch{} wallet=null; addrEl.textContent="—"; balEl.textContent="—"; $("connect").style.display="inline-block"; $("disconnect").style.display="none";};
 
-/* ---------- Helpers ---------- */
-const setStatus = (t)=> statusEl.textContent = t || "";
-const short = (pk)=> pk ? pk.slice(0,4)+"…"+pk.slice(-4) : "—";
-const getPhantomProvider = ()=>{
-  const w = window;
-  if (w?.phantom?.solana?.isPhantom) return w.phantom.solana;
-  if (w?.solana?.isPhantom) return w.solana;
-  return null;
-};
-const getSolflareProvider = ()=>{
-  const w = window;
-  if (w?.solflare) return w.solflare;
-  if (w?.solana?.isSolflare) return w.solana;
-  return null;
-};
-function showProviderName(p){
-  if(!p){ provEl.textContent = "پیدا نشد ❌"; return; }
-  if (p === getPhantomProvider()) provEl.textContent = "Phantom ✅";
-  else if (p === getSolflareProvider()) provEl.textContent = "Solflare ✅";
-  else provEl.textContent = "نامشخص/سازگار ✅";
+/* ---------- Balance with fallback ---------- */
+async function tryBalance(url,pk){const conn=new Connection(url,"confirmed"); rpcUsingEl.textContent=url; try{return await conn.getBalance(pk);}catch{const i=await conn.getAccountInfo(pk); return i?.lamports??0;}}
+async function safeBalance(pk){let last; for(const url of RPCS[network]){try{return await tryBalance(url,pk);}catch(e){last=e;}} throw last;}
+async function refreshBalance(){ if(!wallet){balEl.textContent="—";return;} balEl.textContent="…"; try{const lamports=await safeBalance(new PublicKey(wallet)); balEl.textContent=(lamports/1e9).toFixed(6);}catch{balEl.textContent="خطا";}}
+
+/* ---------- NFT.Storage Upload ---------- */
+async function uploadNFTStorage(blob,token){const r=await fetch("https://api.nft.storage/upload",{method:"POST",headers:{"Authorization":"Bearer "+token},body:blob}); const j=await r.json(); if(!j.ok) throw new Error("NFT.Storage failed"); return "ipfs://"+j.value.cid;}
+
+/* ---------- Embedded PumpX SVG (brand icon) ---------- */
+function pumpxSVG() {
+  // لوگوی ساده و تمیز (سبک آبی-خاکستری)
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+    <rect width="1024" height="1024" fill="#0b0f1a"/>
+    <g transform="translate(128,128)">
+      <circle cx="384" cy="384" r="360" fill="none" stroke="#bfc7d6" stroke-width="24"/>
+      <g>
+        <path d="M240 200h160c96 0 160 64 160 152s-64 152-160 152H320v120h-80V200z" fill="#3aa0ff"/>
+        <path d="M320 336l56 56 92-92 44 44 84-84" fill="none" stroke="#2b74c8" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M260 680v-110l120-120" fill="none" stroke="#2b74c8" stroke-width="22" stroke-linecap="round"/>
+      </g>
+    </g>
+  </svg>`;
+  return new Blob([svg], {type:"image/svg+xml"});
 }
 
-/* ---------- خواندن موجودی با فالبک + گزارش ---------- */
-async function tryBalanceFrom(url, pubkey){
-  const conn = new Connection(url, "confirmed");
-  rpcUsingEl.textContent = url;
-  // تست 1: getBalance
-  try {
-    const lamports = await conn.getBalance(new PublicKey(pubkey));
-    return { ok:true, lamports };
-  } catch (e1) {
-    // تست 2: getAccountInfo (برای تشخیص CORS/Rate-limit)
-    try {
-      const info = await conn.getAccountInfo(new PublicKey(pubkey));
-      if (info) return { ok:true, lamports: info.lamports ?? 0 };
-      return { ok:true, lamports: 0 }; // اکانت وجود ندارد => 0
-    } catch (e2) {
-      throw new Error(`(${url}) ${e2?.message || e2}`);
+/* ---------- Build metadata JSON (generic or PXPX) ---------- */
+async function buildAndUploadMetadata({name,symbol,story,nftKey,iconFile,isPXPX}) {
+  // آیکون: یا فایل کاربر، یا SVG داخلی PumpX
+  let iconBlob = iconFile ? iconFile : pumpxSVG();
+  const imageUri = await uploadNFTStorage(iconBlob, nftKey);
+
+  const metadata = isPXPX ? {
+    name: "PumpX Token",
+    symbol: "PXPX",
+    description: "The native utility token of PumpX — Create • Launch • Grow on Solana. Utility: fee discounts, staking boosts for Trending, governance, and community rewards.",
+    image: imageUri,
+    external_url: "https://pumpx.info",
+    seller_fee_basis_points: 0,
+    attributes: [
+      {"trait_type":"role","value":"platform"},
+      {"trait_type":"utility","value":"fees, staking boosts, governance, rewards"},
+      {"trait_type":"network","value":"solana"},
+      {"trait_type":"brand","value":"PumpX"}
+    ],
+    properties: {
+      category:"image",
+      files:[{uri:imageUri,type: iconFile ? iconFile.type : "image/svg+xml"}]
+    },
+    collection: {name:"PumpX Platform", family:"PumpX"}
+  } : {
+    name, symbol,
+    description: story || `Token ${name} via PumpX`,
+    image: imageUri,
+    external_url: "https://pumpx.info",
+    seller_fee_basis_points: 0,
+    attributes: [
+      {"trait_type":"created_via","value":"PumpX"},
+      {"trait_type":"decimals","value": Number($("decimals").value || 9) }
+    ],
+    properties: {
+      category:"image",
+      files:[{uri:imageUri,type: iconFile ? iconFile.type : "image/svg+xml"}]
     }
-  }
-}
-async function safeGetBalance(pubkeyBase58, net){
-  lastErrEl.textContent = "—";
-  const urls = getRPCs(net);
-  let lastErr = null;
-  for (const url of urls) {
-    try {
-      const res = await tryBalanceFrom(url, pubkeyBase58);
-      if (res.ok) return res.lamports;
-    } catch (e) {
-      lastErr = e;
-      lastErrEl.textContent = String(e);
-      // بعدی را امتحان کن
-    }
-  }
-  throw lastErr || new Error("هیچ RPC در دسترس نیست");
-}
-async function refreshBalance(){
-  if(!walletPubkey){ balEl.textContent="—"; return; }
-  balEl.textContent="…";
-  try{
-    const lamports = await safeGetBalance(walletPubkey, network);
-    balEl.textContent = (lamports/1e9).toFixed(6);
-    setStatus("");
-  }catch(e){
-    balEl.textContent = "خطا";
-    lastErrEl.textContent = String(e);
-    const msg = String(e).toLowerCase();
-    setStatus(
-      msg.includes("429") || msg.includes("rate")
-        ? "RPC شلوغ/ریملیت؛ لطفاً RPC اختصاصی وارد کن."
-        : "RPC عمومی پاسخ نداد؛ یک RPC اختصاصی برای Mainnet وارد کن."
-    );
-  }
+  };
+
+  const metaBlob = new Blob([JSON.stringify(metadata)], {type:"application/json"});
+  const uri = await uploadNFTStorage(metaBlob, nftKey);
+  return { imageUri, uri };
 }
 
-/* ---------- رویدادها ---------- */
-netSel.addEventListener("change", async e=>{
-  network = e.target.value;
-  connection = new Connection(getRPCs(network)[0], "confirmed");
-  await refreshBalance();
-});
-rpcMain.addEventListener("change", ()=>{
-  if (network==="mainnet-beta") connection = new Connection(getRPCs(network)[0], "confirmed");
-});
+/* ---------- Create token + metadata ---------- */
+$("createToken").onclick = async () => {
+  if(!wallet||!provider) return alert("اول کیف را وصل کنید.");
+  const name=$("name").value.trim(), symbol=$("symbol").value.trim();
+  const decimals=Math.max(0,Math.min(9,parseInt($("decimals").value||"9",10)));
+  const supplyHuman=Number($("supply").value||"0"); if(!(supplyHuman>0)) return alert("عرضه اولیه معتبر نیست.");
+  const iconFile=$("icon").files[0]||null, nftKey=$("nftkey").value.trim(), story=$("story").value.trim();
+  if(!nftKey) return alert("NFT.Storage token لازم است.");
 
-/* ---------- اتصال/قطع ---------- */
-async function connectWith(p){
-  if(!p){ setStatus("Provider یافت نشد."); showProviderName(null); return; }
-  provider = p; showProviderName(provider);
+  const signer={ publicKey:new PublicKey(wallet), signTransaction:(tx)=>provider.signTransaction(tx), signAllTransactions:(txs)=>provider.signAllTransactions(txs) };
   try{
-    const resp = await (provider.connect ? provider.connect() : provider.request({method:"connect"}));
-    const pk = resp?.publicKey?.toString?.() || provider.publicKey?.toString?.();
-    if(!pk) throw new Error("PublicKey برنگشت.");
-    walletPubkey = pk;
-    addrEl.textContent = pk;
-    setStatus("متصل شد: "+short(pk));
-    btnDisconnect.disabled = false;
+    statusEl.textContent="آپلود متادیتا…";
+    const { uri } = await buildAndUploadMetadata({name,symbol,story,nftKey,iconFile,isPXPX:false});
+
+    statusEl.textContent="ساخت Mint…";
+    const mintPk=await createMint(connection,signer,new PublicKey(wallet),new PublicKey(wallet),decimals,undefined,undefined,TOKEN_PROGRAM_ID);
+
+    statusEl.textContent="ساخت حساب توکن…";
+    const ata=await getOrCreateAssociatedTokenAccount(connection,signer,mintPk,new PublicKey(wallet));
+
+    statusEl.textContent="مینت عرضه اولیه…";
+    const amount=Math.round(supplyHuman*10**decimals);
+    const sigMint=await mintTo(connection,signer,mintPk,ata.address,new PublicKey(wallet),amount);
+
+    statusEl.textContent="ثبت Metadata روی‌چین…";
+    const umi=createUmi(RPCS[network][0]);
+    umi.use(signerIdentity({ publicKey:umiPk(wallet), signTransaction:async(tx)=>provider.signTransaction(tx), signAllTransactions:async(txs)=>provider.signAllTransactions(txs) }));
+    await createV1(umi,{ mint:umiPk(mintPk.toBase58()),authority:umiPk(wallet),payer:umiPk(wallet),updateAuthority:umiPk(wallet),name,symbol,uri,sellerFeeBasisPoints:0 }).sendAndConfirm(umi);
+
+    const txUrl=`https://explorer.solana.com/tx/${sigMint}?cluster=${network==="devnet"?"devnet":""}`;
+    const addrUrl=`https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${network==="devnet"?"devnet":""}`;
+    const box=$("result"); box.style.display="block"; box.innerHTML=`
+      <div><b>Mint:</b><div class="code">${mintPk.toBase58()}</div></div>
+      <div><a target="_blank" href="${addrUrl}">Explorer</a> • <a target="_blank" href="${txUrl}">Transaction</a></div>
+      <div class="row" style="margin-top:8px"><button id="buyPx" class="btn">Buy PXPX</button></div>`;
+    statusEl.textContent="آماده ✅";
     await refreshBalance();
-  }catch(e){
-    setStatus("خطا/لغو اتصال: "+(e?.message||e));
-    console.error(e);
+
+    // ثبت محلی
+    const reg=JSON.parse(localStorage.getItem("pumpx:list")||"[]");
+    reg.unshift({ts:Date.now(),name,symbol,mint:mintPk.toBase58(),net:network});
+    localStorage.setItem("pumpx:list",JSON.stringify(reg.slice(0,200)));
+    renderExplore();
+    // دکمه خرید PXPX
+    document.getElementById("buyPx").onclick=()=>{$("jup").src="https://jup.ag/swap/SOL-PXPX";};
+    $("lock").disabled=true; // قفل بعد از تایید دستی بهتر است
+  }catch(e){ console.error(e); statusEl.textContent="خطا: "+(e?.message||e); }
+};
+
+/* ---------- One-click: Launch PXPX ---------- */
+$("pxpx").onclick = async ()=>{
+  // پرکردن فرم
+  $("name").value="PumpX Token"; $("symbol").value="PXPX";
+  $("decimals").value=9; $("supply").value=1000000000;
+  $("story").value="The native utility token of PumpX — Create • Launch • Grow on Solana.";
+  if(!$("nftkey").value.trim()) return alert("NFT.Storage token را وارد کنید، سپس دوباره روی Launch کلیک کنید.");
+
+  // اجرا مثل createToken ولی با SVG داخلی و متادیتای ویژه
+  $("createToken").click();
+};
+
+/* ---------- Lock mint (اختیاری) ---------- */
+$("lock").onclick=async ()=>{
+  const mintAddr = $("result").textContent.match(/[1-9A-HJ-NP-Za-km-z]{32,44}/)?.[0];
+  if(!mintAddr||!wallet||!provider) return;
+  try{
+    statusEl.textContent="قفل‌کردن Mint…";
+    const signer={ publicKey:new PublicKey(wallet), signTransaction:(tx)=>provider.signTransaction(tx), signAllTransactions:(txs)=>provider.signAllTransactions(txs) };
+    await setAuthority(connection,signer,new PublicKey(mintAddr),new PublicKey(wallet),AuthorityType.MintTokens,null);
+    statusEl.textContent="Mint قفل شد 🔒";
+  }catch(e){ statusEl.textContent="خطا: "+(e?.message||e); }
+};
+
+/* ---------- Explore (local) ---------- */
+function renderExplore(){
+  const el=$("explist"); el.innerHTML="";
+  const data=(JSON.parse(localStorage.getItem("pumpx:list")||"[]")).slice(0,60);
+  if(!data.length){el.innerHTML='<div class="muted">فعلاً خالی است.</div>';return;}
+  for(const it of data){
+    const card=document.createElement("div"); card.className="card-sm";
+    const url=`https://explorer.solana.com/address/${it.mint}?cluster=${it.net==="devnet"?"devnet":""}`;
+    card.innerHTML=`<div><b>${it.name}</b> <span class="badge">${it.symbol}</span></div>
+    <div class="muted">${new Date(it.ts).toLocaleString()}</div>
+    <div class="code">${it.mint}</div>
+    <div class="row" style="margin-top:8px">
+      <a class="btn" target="_blank" href="${url}">Explorer</a>
+      <button class="btn" data-mint="${it.mint}">Set in Swap</button>
+    </div>`;
+    card.querySelector("button").onclick=()=>{ $("swapMint").value=it.mint; setSwapPair(); };
+    el.appendChild(card);
   }
 }
-async function disconnect(){
-  try{ await provider?.disconnect?.(); }catch{}
-  walletPubkey=null; addrEl.textContent="—"; balEl.textContent="—";
-  btnDisconnect.disabled=true; setStatus("قطع شد");
+$("refreshLocal").onclick=renderExplore; renderExplore();
+
+/* ---------- Swap ---------- */
+function setSwapPair(){ const mint=$("swapMint").value.trim(); if(mint){ $("jup").src=`https://jup.ag/swap/SOL-${mint}`; } }
+$("setSwap").onclick=setSwapPair;
+$("setPXPX").onclick=()=>{$("jup").src="https://jup.ag/swap/SOL-PXPX";};
+
+/* ---------- AI (اختیاری) ---------- */
+async function aiChat(key, prompt){
+  if(!key){
+    const seeds=["Nova","Flux","Neon","Astra","Pulse","Quark"];
+    const name=`${seeds[Math.random()*seeds.length|0]} Token`;
+    const symbol=("PX"+(Math.random()*100|0)).slice(0,4).toUpperCase();
+    const story=`${name}: توکنی برای جامعه‌ای پرانرژی.`;
+    return {options:[{name,symbol,story}],warnings:["قول سود ندهید","Mint را قفل کنید"]};
+  }
+  const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"content-type":"application/json","authorization":"Bearer "+key},body:JSON.stringify({model:"gpt-4o-mini",temperature:0.8,messages:[{role:"system",content:"You are PumpX growth assistant. Return concise JSON only."},{role:"user",content:prompt}]})});
+  const j=await r.json(); const txt=j?.choices?.[0]?.message?.content||"{}"; const m=txt.match(/\{[\s\S]*\}/);
+  try{return JSON.parse(m?m[0]:txt);}catch{return {raw:txt};}
 }
+$("aiBrand").onclick=async()=>{ $("aiStatus").textContent="در حال تولید…"; const out=await aiChat($("openai").value.trim(),`Suggest 3 options: {name<=16, symbol=2-4 caps, story 1 sentence}. Theme: ${$("theme").value}. Return {"options":[...]}.`); const o=out?.options?.[0]||out; if(o?.name)$("name").value=o.name; if(o?.symbol)$("symbol").value=o.symbol; if(o?.story)$("story").value=o.story; $("aiStatus").textContent="اعمال شد ✅"; };
+$("aiRisk").onclick=async()=>{ $("aiStatus").textContent="تحلیل…"; const out=await aiChat($("openai").value.trim(),`Analyze risks and trust-boosters for: ${$("desc").value||$("story").value}. Return {"warnings":["..."],"trust_boosters":["..."]}`); $("riskOut").style.display="block"; $("riskOut").innerHTML=`<div><b>هشدارها</b><ul>${(out?.warnings||[]).map(x=>`<li>${x}</li>`).join("")||"<li>—</li>"}</ul></div><div><b>تقویت اعتماد</b><ul>${(out?.trust_boosters||[]).map(x=>`<li>${x}</li>`).join("")||"<li>—</li>"}</ul></div>`; $("aiStatus").textContent="تمام ✅"; };
 
-/* ---------- دکمه‌ها ---------- */
-btnPhantom.addEventListener("click", ()=>connectWith(getPhantomProvider()));
-btnSolflare.addEventListener("click", ()=>connectWith(getSolflareProvider()));
-btnDisconnect.addEventListener("click", disconnect);
-
-/* ---------- اطلاعات اولیه ---------- */
-window.addEventListener("load", ()=>{
-  const p1 = !!getPhantomProvider();
-  const p2 = !!getSolflareProvider();
-  provEl.textContent = (p1? "Phantom✅ " : "Phantom❌ ") + "| " + (p2? "Solflare✅" : "Solflare❌");
-});
+/* ---------- Auto (silent) ---------- */
+window.addEventListener("load",async()=>{ provEl.textContent=getProvider()?"OK ✅":"Not found ❌"; await new Promise(r=>setTimeout(r,300)); try{const p=getProvider(); if(p){const r=await p.connect?.({onlyIfTrusted:true}); if(r?.publicKey){ wallet=r.publicKey.toString(); addrEl.textContent=wallet; $("connect").style.display="none"; $("disconnect").style.display="inline-block"; $("createToken").disabled=false; await refreshBalance(); }}}catch{};});
 </script>
 </body>
 </html>
