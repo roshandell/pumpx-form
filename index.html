@@ -1,233 +1,127 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PumpX • Token Creator (Stable)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PumpX — Create, Trade & Scale Tokens with AI</title>
+  <meta name="description" content="PumpX is a Solana-based platform to create, trade, and manage tokens with AI tools." />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#FF7E29",
+            secondary: "#6B3CE9",
+            darkbg: "#0E1A2B"
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body{margin:0;background:#0d1117;color:#fff;font-family:Inter,system-ui,"Noto Sans Arabic",sans-serif}
-    .wrap{max-width:900px;margin:auto;padding:24px}
-    h1{margin:0 0 16px}
-    .card{background:#161b22;border:1px solid #2b3542;border-radius:16px;padding:18px;margin-top:16px}
-    label{display:block;margin:8px 0 4px;opacity:.9}
-    input,select,textarea,button{width:100%;border-radius:10px;border:1px solid #2b3542;background:#0f1520;color:#fff;padding:10px}
-    button{cursor:pointer;background:#238636;border:none}
-    button:hover{background:#2ea043}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .half{flex:1 1 300px}
-    .muted{opacity:.8}
-    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-    .kpis .card{padding:12px}
-    .code{word-break:break-all;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b1118;border:1px solid #2b3542;border-radius:8px;padding:8px}
-    #err{position:fixed;inset:0;background:#000c;display:none;z-index:9999}
-    #err .box{max-width:900px;margin:40px auto;background:#1a0f13;border:1px solid #ff5577;padding:16px;border-radius:12px;color:#fff}
-    #err pre{white-space:pre-wrap;direction:ltr}
+    .gradient-text {{
+      background: linear-gradient(90deg, #FF7E29 0%, #6B3CE9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }}
+    .card {{
+      background: #152238;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 1rem;
+    }}
   </style>
-
-  <!-- باندل‌های آماده مرورگر (بدون importmap) -->
-  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.6/dist/browser/index.iife.min.js"></script>
 </head>
-<body>
-<!-- لایه‌ی نمایش خطا -->
-<div id="err"><div class="box">
-  <div style="font-weight:800;color:#ff90a0;margin-bottom:8px">JavaScript Error</div>
-  <pre id="errmsg">...</pre>
-  <button onclick="location.reload()">Reload</button>
-</div></div>
-<script>
-  const showErr=(m)=>{
-    // اگر صفحه لوکال است، خطاهای مربوط به ServiceWorker را نشان نده
-    const skip = /ServiceWorkerRegistration|invalid state/i.test(m||"") && !/^https:/.test(location.protocol);
-    if (skip) { console.warn(m); return; }
-    document.getElementById('errmsg').textContent=m;
-    document.getElementById('err').style.display='block';
-    console.error(m);
-  };
-  window.addEventListener('error',e=>showErr('Error: '+(e.message||e.error||'unknown')),true);
-  window.addEventListener('unhandledrejection',e=>showErr('Promise rejection: '+(e.reason?.message||e.reason||'unknown')),true);
-</script>
-
-<div class="wrap">
-  <h1>🚀 PumpX Token Creator</h1>
-
-  <div class="row">
-    <div class="half">
-      <label>شبکه</label>
-      <select id="network">
-        <option value="devnet" selected>Devnet</option>
-        <option value="mainnet-beta">Mainnet</option>
-      </select>
+<body class="min-h-screen bg-darkbg text-white antialiased">
+  <!-- Header -->
+  <header class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <img src="assets/logo.png" alt="PumpX logo" class="h-8 w-auto" />
+      <span class="text-xl font-bold text-primary">PumpX</span>
     </div>
-    <div class="half">
-      <label>کیف پول</label>
-      <select id="walletSel">
-        <option value="phantom">Phantom</option>
-        <option value="solflare">Solflare</option>
-      </select>
+    <nav class="hidden md:flex items-center space-x-8 text-gray-300">
+      <a href="#features" class="hover:text-primary">Features</a>
+      <a href="#market" class="hover:text-primary">Market</a>
+      <a href="#ai" class="hover:text-primary">AI Tools</a>
+      <a href="#contact" class="hover:text-primary">Contact</a>
+    </nav>
+    <a href="#" class="md:inline-flex hidden px-4 py-2 rounded-xl bg-primary hover:opacity-90">Connect Wallet</a>
+  </header>
+
+  <!-- Hero -->
+  <section class="max-w-7xl mx-auto px-6 pt-10 pb-20 text-center">
+    <h1 class="text-5xl font-extrabold gradient-text">Create, Trade & Scale Tokens with AI</h1>
+    <p class="mt-6 text-lg text-gray-300 max-w-3xl mx-auto">
+      PumpX is the next-gen Solana platform for launching and managing tokens.
+      Powered by AI for smarter trading, tokenomics, and security.
+    </p>
+    <div class="mt-8 flex items-center justify-center space-x-4">
+      <a href="#create" class="px-6 py-3 rounded-2xl bg-primary hover:opacity-90">Launch Token</a>
+      <a href="#market" class="px-6 py-3 rounded-2xl border border-secondary text-secondary hover:bg-secondary/10">Explore Market</a>
     </div>
-  </div>
+  </section>
 
-  <div class="row">
-    <button id="connect" class="half">اتصال کیف</button>
-    <button id="disconnect" class="half" style="background:#444">قطع اتصال</button>
-  </div>
-
-  <div class="kpis">
-    <div class="card"><div class="muted">Provider</div><div id="prov" class="code">—</div></div>
-    <div class="card"><div class="muted">آدرس</div><div id="addr" class="code">—</div></div>
-    <div class="card"><div class="muted">موجودی SOL</div><div id="bal" class="code">—</div></div>
-    <div class="card"><div class="muted">RPC</div><div id="rpcUsing" class="code">—</div></div>
-  </div>
-
-  <div class="card">
-    <div class="row">
-      <div class="half">
-        <label>نام توکن</label><input id="name" value="PumpX Token"/>
-      </div>
-      <div class="half">
-        <label>نماد</label><input id="symbol" value="PXPX"/>
+  <!-- Features -->
+  <section id="features" class="bg-[#0E1A2B] py-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-10">Platform Features</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="card p-6">
+          <h3 class="text-xl font-semibold text-primary mb-2">AI Tokenomics</h3>
+          <p class="text-gray-300">Automatic tokenomics design and analysis with AI-powered insights.</p>
+        </div>
+        <div class="card p-6">
+          <h3 class="text-xl font-semibold text-primary mb-2">Secure Trading</h3>
+          <p class="text-gray-300">On-chain security checks, rug-pull detection, and safe swaps.</p>
+        </div>
+        <div class="card p-6">
+          <h3 class="text-xl font-semibold text-primary mb-2">Live Analytics</h3>
+          <p class="text-gray-300">Real-time charts, liquidity tracking, and whale alerts.</p>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="half">
-        <label>Decimals</label><input id="decimals" type="number" value="9" min="0" max="9"/>
-      </div>
-      <div class="half">
-        <label>عرضه اولیه (واحد انسانی)</label><input id="supply" type="number" value="1000000000"/>
+  </section>
+
+  <!-- Market Preview -->
+  <section id="market" class="bg-[#111a2b] py-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-10">Live Market Preview</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="card p-6">
+          <h3 class="text-xl font-semibold text-secondary mb-4">Top Tokens</h3>
+          <ul class="space-y-2 text-gray-300">
+            <li class="flex justify-between"><span>PUMPX</span><span>$0.12</span></li>
+            <li class="flex justify-between"><span>AIcoin</span><span>$1.42</span></li>
+            <li class="flex justify-between"><span>GameFiX</span><span>$0.07</span></li>
+          </ul>
+        </div>
+        <div class="card p-6">
+          <h3 class="text-xl font-semibold text-secondary mb-4">Trending Now</h3>
+          <p class="text-gray-300">Live token trends powered by AI detection.</p>
+        </div>
       </div>
     </div>
-    <button id="create">🪙 ایجاد توکن SPL</button>
-    <div id="status" class="muted" style="margin-top:8px"></div>
-    <div id="out" class="card" style="display:none;margin-top:12px"></div>
-  </div>
-</div>
+  </section>
 
-<script>
-(() => {
-  const { Connection, clusterApiUrl, PublicKey } = window.solanaWeb3;
-  const spl = window.splToken;
+  <!-- AI Tools -->
+  <section id="ai" class="bg-[#0E1A2B] py-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-10">AI Tools for Every Trader</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="card p-6 text-center"><h3 class="text-xl font-semibold text-primary">AI Token Creator</h3></div>
+        <div class="card p-6 text-center"><h3 class="text-xl font-semibold text-primary">Rug-Pull Detector</h3></div>
+        <div class="card p-6 text-center"><h3 class="text-xl font-semibold text-primary">Smart Liquidity Manager</h3></div>
+      </div>
+    </div>
+  </section>
 
-  const HELIUS = "https://mainnet.helius-rpc.com/?api-key=b553d42b-55cd-48ca-bf99-e81ff18ef4d6";
-  const RPCS = {
-    "devnet": [clusterApiUrl("devnet"), "https://api.devnet.solana.com"],
-    "mainnet-beta": [HELIUS, clusterApiUrl("mainnet-beta"), "https://api.mainnet-beta.solana.com"]
-  };
-
-  const $ = id => document.getElementById(id);
-  const provEl = $("prov"), addrEl=$("addr"), balEl=$("bal"), status=$("status"), out=$("out"), rpcEl=$("rpcUsing");
-
-  let network = $("network").value;
-  let connection = new Connection(RPCS[network][0], "confirmed");
-  rpcEl.textContent = RPCS[network][0];
-
-  let provider=null, wallet=null;
-
-  $("network").onchange = async (e) => {
-    network = e.target.value;
-    connection = new Connection(RPCS[network][0], "confirmed");
-    rpcEl.textContent = RPCS[network][0];
-    await refreshBalance();
-  };
-
-  function getProvider() {
-    const w=window;
-    const sel = $("walletSel").value;
-    if (sel==="phantom") {
-      if (w?.phantom?.solana?.isPhantom) return w.phantom.solana;
-      if (w?.solana?.isPhantom) return w.solana;
-    } else {
-      if (w?.solflare?.isSolflare) return w.solflare;
-      if (w?.solana?.isSolflare) return w.solana;
-    }
-    return null;
-  }
-
-  $("connect").onclick = async () => {
-    provider = getProvider();
-    provEl.textContent = provider ? "Detected ✅" : "Not found ❌";
-    if (!provider) { alert("افزونه انتخاب‌شده نصب/باز نیست."); return; }
-    try {
-      const r = await (provider.connect ? provider.connect() : provider.request?.({method:"connect"}));
-      wallet = (r?.publicKey?.toString?.()) || provider.publicKey?.toString?.();
-      addrEl.textContent = wallet || "—";
-      await refreshBalance();
-      status.textContent = "آماده ✅";
-    } catch (e) { status.textContent="خطا: "+(e?.message||e); }
-  };
-
-  $("disconnect").onclick = async () => {
-    try{ await provider?.disconnect?.(); }catch{}
-    wallet=null; addrEl.textContent="—"; balEl.textContent="—";
-  };
-
-  async function tryBalance(url,pk) {
-    const c = new Connection(url, "confirmed"); rpcEl.textContent = url;
-    try { return await c.getBalance(pk); }
-    catch { const info = await c.getAccountInfo(pk); return info?.lamports ?? 0; }
-  }
-  async function safeBalance(pk){
-    let last; for (const url of RPCS[network]) {
-      try { return await tryBalance(url,pk); } catch(e){ last=e; }
-    } throw last;
-  }
-  async function refreshBalance(){
-    if (!wallet) { balEl.textContent="—"; return; }
-    balEl.textContent = "…";
-    try {
-      const lam = await safeBalance(new PublicKey(wallet));
-      balEl.textContent = (lam/1e9).toFixed(6);
-    } catch { balEl.textContent="خطا"; }
-  }
-
-  $("create").onclick = async () => {
-    if (!wallet || !provider) { alert("اول کیف را وصل کنید."); return; }
-    const name = $("name").value.trim();
-    const symbol = $("symbol").value.trim();
-    const decimals = Math.max(0,Math.min(9,parseInt($("decimals").value||"9",10)));
-    const supply = Number($("supply").value||"0");
-    if (!name || !symbol || !(supply>0)) { alert("مقادیر را درست وارد کنید."); return; }
-
-    try {
-      status.textContent = "در حال ساخت Mint…";
-      const signer = {
-        publicKey: new PublicKey(wallet),
-        signTransaction: (tx)=>provider.signTransaction(tx),
-        signAllTransactions: (txs)=>provider.signAllTransactions(txs)
-      };
-
-      const mintPk = await spl.createMint(
-        connection, signer,
-        new PublicKey(wallet), new PublicKey(wallet),
-        decimals, undefined, undefined, spl.TOKEN_PROGRAM_ID
-      );
-
-      status.textContent = "ساخت حساب توکن…";
-      const ata = await spl.getOrCreateAssociatedTokenAccount(
-        connection, signer, mintPk, new PublicKey(wallet)
-      );
-
-      status.textContent = "مینت عرضه اولیه…";
-      const amount = Math.round(supply * 10**decimals);
-      const sig = await spl.mintTo(connection, signer, mintPk, ata.address, new PublicKey(wallet), amount);
-
-      const cluster = network==="devnet" ? "devnet" : "";
-      const mintUrl = `https://explorer.solana.com/address/${mintPk.toBase58()}?cluster=${cluster}`;
-      const txUrl = `https://explorer.solana.com/tx/${sig}?cluster=${cluster}`;
-      out.style.display="block";
-      out.innerHTML = `
-        <div><b>Mint:</b> <div class="code">${mintPk.toBase58()}</div></div>
-        <div class="row">
-          <a class="code" target="_blank" href="${mintUrl}" style="flex:1;text-align:center">Explorer</a>
-          <a class="code" target="_blank" href="${txUrl}" style="flex:1;text-align:center">Transaction</a>
-        </div>`;
-      status.textContent = "تمام شد ✅";
-    } catch (e) {
-      console.error(e);
-      status.textContent = "خطا: " + (e?.message||e);
-    }
-  };
-})();
-</script>
+  <!-- Footer -->
+  <footer id="contact" class="border-t border-white/10 py-10 text-center text-gray-400">
+    <p>© 2025 PumpX — pumpx.info | Contact: <a href="mailto:support@pumpx.info" class="underline">support@pumpx.info</a></p>
+  </footer>
 </body>
-        </html>
+</html>
