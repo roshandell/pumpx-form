@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PumpX • Safe v2 (Dynamic Imports + Error Overlay)</title>
-<link rel="preconnect" href="https://esm.sh"/>
+<title>PumpX • Safe v2 (jsDelivr ESM + Error Overlay)</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net"/>
 <style>
   :root{--bg:#0b0f1a;--card:#0f1524;--line:#334466;--accent:#79d9ff}
   *{box-sizing:border-box}
@@ -93,8 +93,8 @@
 </script>
 
 <script type="module">
-/* =====  فقط web3.js را از اول لود می‌کنیم  ===== */
-import { Connection, clusterApiUrl, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.3";
+/* ===== فقط web3.js را از jsDelivr لود می‌کنیم ===== */
+import { Connection, clusterApiUrl, PublicKey } from "https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.browser.esm.js";
 
 const $=id=>document.getElementById(id);
 $("https").textContent = location.protocol.startsWith("https") ? "HTTPS: بله ✅" : "HTTPS: خیر ❌ — حتماً با HTTPS باز کنید.";
@@ -164,7 +164,7 @@ $("disconnect").onclick=async ()=>{
   $("connect").style.display="inline-block"; $("disconnect").style.display="none";
 };
 
-/* ===== Dynamic Imports فقط هنگام ساخت ===== */
+/* ===== کمک‌ها ===== */
 async function uploadNFTStorage(blob,token){
   const r=await fetch("https://api.nft.storage/upload",{method:"POST",headers:{"Authorization":"Bearer "+token},body:blob});
   const j=await r.json(); if(!j.ok) throw new Error("NFT.Storage failed"); return "ipfs://"+j.value.cid;
@@ -179,6 +179,13 @@ function pumpxSVG(){
   return new Blob([svg],{type:"image/svg+xml"});
 }
 
+/* ===== Dynamic Imports از jsDelivr ===== */
+const importSpl = ()=> import("https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.6/+esm");
+const importUmiBundle = ()=> import("https://cdn.jsdelivr.net/npm/@metaplex-foundation/umi-bundle-defaults@0.8.10/+esm");
+const importUmiCore = ()=> import("https://cdn.jsdelivr.net/npm/@metaplex-foundation/umi@0.8.10/+esm");
+const importMplTM = ()=> import("https://cdn.jsdelivr.net/npm/@metaplex-foundation/mpl-token-metadata@3.1.2/+esm");
+
+/* ===== ساخت توکن ===== */
 $("createToken").onclick=async ()=>{
   if(!wallet||!provider) return alert("اول کیف را وصل کنید.");
   const name=$("name").value.trim(), symbol=$("symbol").value.trim();
@@ -188,11 +195,10 @@ $("createToken").onclick=async ()=>{
   if(!nftKey) return alert("NFT.Storage token لازم است.");
 
   statusEl.textContent="بارگذاری ماژول‌ها…";
-  // ⬇️ اگر این ایمپورت‌ها به هر دلیلی خطا بدهند، خطایش روی صفحه دیده می‌شود ولی بقیه UI زنده می‌ماند.
-  const spl = await import("https://esm.sh/@solana/spl-token@0.4.6?bundle");
-  const umiBundle = await import("https://esm.sh/@metaplex-foundation/umi-bundle-defaults@0.8.10");
-  const umiCore = await import("https://esm.sh/@metaplex-foundation/umi@0.8.10");
-  const mplTM = await import("https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.1.2");
+  const spl = await importSpl();
+  const umiBundle = await importUmiBundle();
+  const umiCore = await importUmiCore();
+  const mplTM = await importMplTM();
 
   try{
     statusEl.textContent="آپلود آیکون/JSON…";
@@ -247,11 +253,12 @@ $("createToken").onclick=async ()=>{
   }
 };
 
+/* ===== قفل Mint ===== */
 $("lock").onclick=async ()=>{
   const text=$("result").textContent;
   const mintAddr=(text && text.match(/[1-9A-HJ-NP-Za-km-z]{32,44}/)?.[0])||"";
   if(!mintAddr||!wallet) return;
-  const spl = await import("https://esm.sh/@solana/spl-token@0.4.6?bundle");
+  const spl = await importSpl();
   try{
     statusEl.textContent="قفل کردن Mint…";
     const signer={ publicKey:new PublicKey(wallet), signTransaction:(tx)=>provider.signTransaction(tx), signAllTransactions:(txs)=>provider.signAllTransactions(txs) };
