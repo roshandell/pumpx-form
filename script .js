@@ -34,3 +34,29 @@ document.getElementById("tokenForm").addEventListener("submit", function (e) {
 
   alert(`توکن "${name}" با نماد "${symbol}" و عرضه ${supply} ثبت شد!`);
 });
+// ---------- Module Resolution Debug ----------
+const testBtn = document.createElement("button");
+testBtn.className = "btn";
+testBtn.textContent = "آزمایش ماژول‌ها";
+document.querySelector(".tabs").after(Object.assign(document.createElement("div"),{className:"row"})).appendChild(testBtn);
+
+const modStatus = document.createElement("div");
+modStatus.className = "card";
+document.querySelector(".tabs").after(modStatus);
+
+testBtn.onclick = async () => {
+  const mods = [
+    "buffer","process","util","events","stream","crypto",
+    "bn.js","bs58","@solana/buffer-layout","@solana/buffer-layout-utils",
+    "borsh","bigint-buffer","safe-buffer","ieee754",
+    "@noble/curves/ed25519","@noble/hashes/sha256","@noble/hashes/sha512","@noble/hashes/utils"
+  ];
+  let html = "<b>نتیجه تست ماژول‌ها:</b><ul>";
+  for (const m of mods) {
+    try { await import(m); html += `<li>✅ ${m}</li>`; }
+    catch(e){ html += `<li>❌ ${m} — <code>${e?.message||e}</code></li>`; }
+  }
+  html += "</ul><div class='muted'>اگر حتی یکی ❌ بود، ImportMap آن بسته را باید اصلاح کنیم.</div>";
+  modStatus.innerHTML = html;
+};
+
