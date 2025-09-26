@@ -1,145 +1,205 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PumpX • Create, Trade & Scale Tokens with AI</title>
-
-  <!-- Favicon / Social -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png">
-  <link rel="apple-touch-icon" href="/assets/favicon.png">
-  <meta property="og:title" content="PumpX • AI Token Platform">
-  <meta property="og:description" content="Create, Trade & Scale tokens with AI tools on Solana.">
-  <meta property="og:image" content="https://pumpx.info/assets/logo.png">
-  <meta name="theme-color" content="#0b1220" />
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PumpX — Create, Trade & Scale Tokens with AI</title>
+  <meta name="description" content="PumpX is the next-gen Solana platform to create, trade, and manage tokens with AI." />
+  <link rel="icon" href="/assets/favicon.png" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="container header-grid">
       <a class="brand" href="/">
-        <img src="/assets/logo.png" alt="PumpX" class="logo">
+        <img src="/assets/logo.png" alt="PumpX" class="logo" />
       </a>
+
       <nav class="nav">
-        <a href="#ai-wizard">AI Wizard</a>
-        <a href="#live">Live</a>
-        <a href="#trending">Trending</a>
-        <a href="#roadmap">Roadmap</a>
+        <a data-i18n="nav.aiWizard" href="#ai-wizard">جادوی هوش مصنوعی</a>
+        <a data-i18n="nav.live" href="#live">زنده</a>
+        <a data-i18n="nav.trending" href="#trending">ترندها</a>
+        <a data-i18n="nav.roadmap" href="#roadmap">نقشه راه</a>
       </nav>
-      <button id="connectBtn" class="btn primary">Connect Wallet</button>
+
+      <div class="actions">
+        <div class="lang-box">
+          <button id="langFA" class="btn ghost" data-i18n="lang.fa">فا</button>
+          <button id="langEN" class="btn ghost" data-i18n="lang.en">EN</button>
+        </div>
+        <button id="connectBtn" class="btn primary" data-i18n="btn.connect">اتصال کیف‌پول</button>
+      </div>
     </div>
   </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <h1>Create, Trade & Scale Tokens with <span class="grad">AI</span></h1>
-      <p class="muted">PumpX is the next-gen Solana platform to launch and manage tokens with AI tools.</p>
-      <div class="hero-actions">
-        <a href="#ai-wizard" class="btn primary">Start with AI</a>
-        <a href="#trending" class="btn secondary">Explore Market</a>
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <h1 data-i18n="hero.title">ساخت، معامله و رشد توکن‌ها با <span class="grad">هوش مصنوعی</span></h1>
+        <p class="muted" data-i18n="hero.subtitle">PumpX پلتفرم نسل جدید سولانا برای ساخت و مدیریت توکن‌ها با ابزارهای هوش مصنوعی است.</p>
+        <div class="hero-actions">
+          <a href="#ai-wizard" class="btn primary" data-i18n="btn.startAI">شروع با هوش مصنوعی</a>
+          <a href="#trending" class="btn secondary" data-i18n="btn.explore">بازار را ببین</a>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ===== AI Launch Wizard ===== -->
-  <section id="ai-wizard" class="section">
-    <div class="container">
-      <h2 class="h2">Launch a Token with AI</h2>
-      <p class="muted">اسم، نماد، عرضه اولیه، نقدینگی و توضیحات را هوش مصنوعی پیشنهاد می‌دهد.</p>
-      <div class="card">
-        <form id="aiLaunchForm">
-          <div class="grid-2">
-            <div>
-              <label>Token Name</label>
-              <input id="tName" type="text" placeholder="PumpX AI Token">
-            </div>
-            <div>
-              <label>Symbol</label>
-              <input id="tSymbol" type="text" placeholder="PXA">
-            </div>
-            <div>
-              <label>Total Supply</label>
-              <input id="tSupply" type="number" placeholder="1000000000">
-            </div>
-            <div>
-              <label>Liquidity %</label>
-              <input id="tLiq" type="number" placeholder="80">
-            </div>
-          </div>
-          <label>Project Brief (اختیاری)</label>
-          <textarea id="tBrief" rows="3" placeholder="ایده‌ی توکن را بنویس..."></textarea>
+    <!-- AI WIZARD -->
+    <section id="ai-wizard" class="section">
+      <div class="container">
+        <h2 class="h2" data-i18n="ai.title">ساخت توکن با هوش مصنوعی</h2>
+        <p class="muted" data-i18n="ai.desc">اسم، نماد، عرضه، نقدینگی و توضیحات را هوش مصنوعی پیشنهاد می‌دهد.</p>
 
-          <div class="actions">
-            <button type="button" id="btnAiSuggest" class="btn secondary">AI Suggest</button>
-            <button type="submit" class="btn primary">Create Token</button>
+        <form id="aiForm" class="card form-grid">
+          <label>
+            <span data-i18n="ai.name">نام توکن</span>
+            <input id="aiName" placeholder="مثلاً PumpX AI" />
+          </label>
+          <label>
+            <span data-i18n="ai.symbol">نماد</span>
+            <input id="aiSymbol" placeholder="مثلاً PXP" />
+          </label>
+          <label>
+            <span data-i18n="ai.supply">عرضه کل</span>
+            <input id="aiSupply" type="number" min="1" placeholder="1000000000" />
+          </label>
+          <label>
+            <span data-i18n="ai.liq">درصد نقدینگی</span>
+            <input id="aiLiq" type="number" min="1" max="100" placeholder="60" />
+          </label>
+          <label class="col-2">
+            <span data-i18n="ai.brief">شرح پروژه (اختیاری)</span>
+            <textarea id="aiBrief" rows="3" placeholder="ایده/کاربرد/هدف..."></textarea>
+          </label>
+
+          <div class="form-actions col-2">
+            <button type="button" id="aiSuggest" class="btn secondary" data-i18n="ai.suggest">پیشنهاد هوش مصنوعی</button>
+            <button type="submit" class="btn primary" data-i18n="ai.create">ساخت توکن</button>
           </div>
         </form>
-        <div id="aiOutput" class="ai-output hidden"></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ===== Live Market Ticker ===== -->
-  <section id="live" class="section alt">
-    <div class="container">
-      <h2 class="h2">Live Market</h2>
-      <div id="ticker" class="ticker"></div>
-    </div>
-  </section>
-
-  <!-- ===== Trending Tokens Table ===== -->
-  <section id="trending" class="section">
-    <div class="container">
-      <h2 class="h2">Trending on PumpX</h2>
-      <div class="table-wrap">
-        <table id="trendTable">
-          <thead>
-            <tr>
-              <th>Token</th><th>Price</th><th>24h</th><th>Liquidity</th><th>Holders</th><th></th>
-            </tr>
-          </thead>
-          <tbody><!-- filled by JS --></tbody>
-        </table>
+    <!-- LIVE MARKET -->
+    <section id="live" class="section">
+      <div class="container">
+        <h2 class="h2" data-i18n="live.title">بازار زنده</h2>
+        <div id="liveTicker" class="ticker"></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ===== Roadmap & FAQ ===== -->
-  <section id="roadmap" class="section alt">
-    <div class="container">
-      <h2 class="h2">Roadmap</h2>
-      <div class="road">
-        <div><span>Q4 2025</span><p>AI Wizard v1، تیکر زنده، اتصال Phantom/Solflare.</p></div>
-        <div><span>Q1 2026</span><p>مارکت‌میکر خودکار + پنل تحلیل زنده.</p></div>
-        <div><span>Q2 2026</span><p>لانچ توکن پلتفرم PXP و استیکینگ.</p></div>
+    <!-- TRENDING -->
+    <section id="trending" class="section">
+      <div class="container">
+        <h2 class="h2" data-i18n="trend.title">ترندهای PumpX</h2>
+        <div class="table-tools">
+          <input id="trendSearch" class="input" placeholder="جستجو..." />
+          <select id="trendSort" class="input">
+            <option value="volume24h">حجم ۲۴س</option>
+            <option value="liquidity">نقدینگی</option>
+            <option value="holders">هولدرها</option>
+            <option value="price">قیمت</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="table" id="trendTable">
+            <thead>
+              <tr>
+                <th data-i18n="table.token">توکن</th>
+                <th data-i18n="table.price">قیمت</th>
+                <th data-i18n="table.chg">۲۴ساعت</th>
+                <th data-i18n="table.liq">نقدینگی</th>
+                <th data-i18n="table.holders">هولدرها</th>
+                <th data-i18n="table.trade">معامله</th>
+              </tr>
+            </thead>
+            <tbody id="trendBody"></tbody>
+          </table>
+        </div>
       </div>
+    </section>
 
-      <h3 class="h3 mt32">FAQ</h3>
-      <details><summary>چطور کیف‌پول متصل کنم؟</summary><p>روی Connect Wallet بزنید؛ اگر Phantom یا Solflare نصب باشد شناسایی می‌شود.</p></details>
-      <details><summary>هزینه ساخت توکن؟</summary><p>فقط کارمزد شبکه سولانا + کمیسیون ناچیز پلتفرم (قابل تنظیم).</p></details>
-    </div>
-  </section>
+    <!-- ROADMAP -->
+    <section id="roadmap" class="section">
+      <div class="container">
+        <h2 class="h2" data-i18n="road.title">نقشه راه</h2>
+        <ul class="road">
+          <li data-i18n="road.q4">جادوی هوش مصنوعی نسخه ۱، تیکر زنده، اتصال Phantom/Solflare.</li>
+          <li data-i18n="road.q1">مارکت‌میکر خودکار + تحلیل زنده.</li>
+          <li data-i18n="road.q2">توکن پلتفرم (PXP) و استیکینگ.</li>
+        </ul>
+      </div>
+    </section>
 
-  <!-- Footer -->
+    <!-- FAQ -->
+    <section class="section">
+      <div class="container">
+        <h2 class="h2" data-i18n="faq.title">پرسش‌های متداول</h2>
+        <div class="faq">
+          <details>
+            <summary data-i18n="faq.q1">چطور کیف‌پول متصل کنم؟</summary>
+            <p class="muted" data-i18n="faq.a1">روی «اتصال کیف‌پول» بزنید؛ اگر Phantom یا Solflare نصب باشد شناسایی می‌شود.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q2">هزینه ساخت توکن چقدر است؟</summary>
+            <p class="muted" data-i18n="faq.a2">فقط کارمزد شبکه سولانا + کارمزد کوچک پلتفرم.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
   <footer class="footer">
-    <div class="container foot-grid">
+    <div class="container footer-grid">
       <div>
-        <img src="/assets/logo.png" alt="PumpX" class="logo-sm">
-        <p class="muted">Create, Trade & Scale tokens with AI.</p>
+        <strong data-i18n="footer.tag">ساخت، معامله و رشد توکن‌ها با هوش مصنوعی.</strong>
+        <div class="muted" data-i18n="footer.copy">© PumpX ۲۰۲۵ • pumpx.info</div>
       </div>
-      <nav>
-        <a href="#ai-wizard">AI Wizard</a>
-        <a href="#live">Live</a>
-        <a href="#trending">Trending</a>
-        <a href="#roadmap">Roadmap</a>
-      </nav>
-      <div class="muted">© PumpX 2025 • pumpx.info</div>
+      <div class="right">
+        <a href="#ai-wizard" class="btn small secondary" data-i18n="btn.startAI">شروع با هوش مصنوعی</a>
+      </div>
     </div>
   </footer>
 
-  <script src="/app.js"></script>
+
+<script src="/app.js" defer></script>
+<hr class="sep"/>
+
+<h3 class="h2" data-i18n="ai.launch">ساخت توکن توسط کاربر</h3>
+<form id="launchForm" class="card form-grid">
+  <label>
+    <span data-i18n="ai.name">نام توکن</span>
+    <input id="tName" required placeholder="PumpX AI"/>
+  </label>
+  <label>
+    <span data-i18n="ai.symbol">نماد</span>
+    <input id="tSymbol" required maxlength="8" placeholder="PXP"/>
+  </label>
+  <label>
+    <span data-i18n="ai.supply">عرضه کل</span>
+    <input id="tSupply" required type="number" min="1" placeholder="1000000000"/>
+  </label>
+  <label>
+    <span>Decimals</span>
+    <input id="tDecimals" type="number" min="0" max="9" value="6"/>
+  </label>
+  <label class="col-2">
+    <span data-i18n="ai.brief">شرح پروژه</span>
+    <textarea id="tDesc" rows="3" placeholder="توضیحات کوتاه..."></textarea>
+  </label>
+  <label>
+    <span>آیکون (PNG/SVG)</span>
+    <input id="tIcon" type="file" accept=".png,.svg,.jpg,.jpeg" />
+  </label>
+  <div class="col-2 muted">
+    <span id="feeNote"></span>
+  </div>
+  <div class="form-actions col-2">
+    <button type="submit" class="btn primary">ساخت توکن روی سولانا (Devnet)</button>
+  </div>
+</form>
+  
 </body>
 </html>
