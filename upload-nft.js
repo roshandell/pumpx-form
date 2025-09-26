@@ -2,7 +2,7 @@
 // این اسکریپت برای آپلود فایل (مثلاً لوگو یا آیکون توکن) روی NFT.Storage ساخته شده
 
 // 🔑 اینجا API Key خودت رو قرار بده
-const NFT_STORAGE_API = "⬜396c66f2.85bd820e33d54ff5bdcffffd2dfa6549";
+const NFT_STORAGE_API = "396c66f2.85bd820e33d54ff5bdcffffd2dfa6549";
 
 // تابع آپلود فایل به NFT.Storage
 async function uploadToNFTStorage(file) {
